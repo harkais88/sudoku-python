@@ -83,14 +83,14 @@ def checkSafe(table,i,j,num):
     #Perform cell check, and if all passed, the cell check function itself passes True
     return unUsedNum(table,i - i%3,j - j%3,num) #A nifty trick to avoid index error here, ex - for 0,7, parameter passed to unUsedNum is 0 - 0%3 = 0, 7 - 7%3 = 6 => 0,6, which is the uppermost left side cell we are currently working with
 
-if __name__ == "__main__":
+#if __name__ == "__main__": #Only if this script needs to run
+def sudokuGridGen():
     table = [[0 for _ in range(9)] for _ in range(9)] #Should initialize a list of lists with all elements as 0
 
     table = initCellGen(table)
 
     remainCellGen(table,0,3) #Should then start filling from the 1strow 4column element
 
-    for row in table:
-        print(row,"\n")
+    return table #Comment this line when running this script only
 
 
