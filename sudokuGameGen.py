@@ -1,36 +1,6 @@
 #!/usr/bin/python3
 
-import sudokuGridGen as sgg
-import random
-
-#Should Delete Random Cells from Grid
-def randCellDelete(table,noOfClues):
-    counter = 0
-    while counter < 9*9 - noOfClues:
-        chck = False
-        while chck == False:
-            i = random.randint(0,8)
-            j = random.randint(0,8)
-            if table[i][j] != 0:
-                table[i][j] = 0
-                chck = True
-        counter += 1
-    for row in table:
-        print(row, "\n")
-
-
-#Main Purpose here: Create a generic terminal Sudoku Game :)
-if __name__ == "__main__":
-    chck = 0
-    while chck < 1 or chck > 4:
-        diff = int(input("\n CHOOSE YOUR DIFFICULITY: 1)EASY 2)MEDIUM 3)HARD 4)IMPOSSIBLE: "))
-        if diff < 1 or diff > 4:
-            print("\n Try entering the number")
-        chck = diff
-        
-    table = sgg.sudokuGridGen()
-
-    """
+"""
     According to the minimum number of givens in Sudoku, there should be atleast 17 clues for
     a Sudoku puzzle to be solved using logic and not random guessing. Adhering to this, I am 
     setting the difficulities as follows, and note this is of personal taste:
@@ -45,17 +15,65 @@ if __name__ == "__main__":
 
     However, this may not be a guarentee that a good Sudoku Puzzle is generated. Need to develop 
     a sudoku solver that can solve the generated puzzle using logic only, and would score the puzzle if it is good. The puzzle would be best if it only has 1 solution.
-    """
+"""
+
+import sudokuGridGen as sgg
+from sudokuSolver import sudokuSolver
+
+def printGrid(table):
+    for row in table:
+        print("\n",row)
+
+#Should Delete Random Cells from Grid
+def randCellDelete(sol,noOfClues):
+    counter = 0
+    while counter < 9*9 - noOfClues:
+        chck = False
+        while chck == False:
+            i = sgg.random.randint(0,8)
+            j = sgg.random.randint(0,8)
+            if sol[i][j] != 0:
+                sol[i][j] = 0
+                chck = True
+        counter += 1
+    return sol
+
+#Main Purpose here: Create a generic terminal Sudoku Game :)
+#Execute this script when testing for game generation
+if __name__ == "__main__":
+    chck = 0
+    while chck < 1 or chck > 4:
+        diff = int(input("\n CHOOSE YOUR DIFFICULITY: 1)EASY 2)MEDIUM 3)HARD 4)IMPOSSIBLE: "))
+        if diff < 1 or diff > 4:
+            print("\n Try entering the number")
+        chck = diff
+        
+    sol = sgg.sudokuGridGen() #This variable is our solution
+
+    #For printing the solution grid, use only in terminal
+    print("\n OUR SOLUTION")
+    printGrid(sol)
+
 
     if diff == 1:
-         noOfClues = random.randint(35,45)
+         noOfClues = sgg.random.randint(35,45)
     elif diff == 2:
-        noOfClues = random.randint(31,34)
+        noOfClues = sgg.random.randint(31,34)
     elif diff == 3:
-        noOfClues = random.randint(25,30)
+        noOfClues = sgg.random.randint(25,30)
     else:
-        noOfClues = random.randint(17,24)
+        noOfClues = sgg.random.randint(17,24)
 
+    puzzle = randCellDelete(sol,noOfClues) #This variable is our puzzle
+
+    #For printing the puzzle grid, use only in terminal
+    print("\n OUR PUZZLE")
+    printGrid(puzzle)
+
+    #Solving our puzzle
+    sudokuSolver(puzzle)
+
+    print("\n OUR SOLVED PUZZLE")
+    printGrid(puzzle)
     
-    randCellDelete(table,noOfClues) 
 

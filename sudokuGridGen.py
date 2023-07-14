@@ -3,7 +3,9 @@
 import random
 
 def initCellGen(table):
+    #print("\n Making our Diagonal Cells")
     for cell in range(0,9,3): #Cell here should represent the cell number we are working with
+        #print("\n Working with the {},{} index".format(cell,cell))
         initFillCell(table,cell,cell)
     return table
 
@@ -18,11 +20,14 @@ def initFillCell(table,row,col):
                     num = nolist_cp[0]
                 else: 
                     num = random.choice(nolist_cp)
+                #print("\n Seeing if num = {} can be placed in {},{}".format(num,row+i,col+j))
                 if unUsedNum(table,row,col,num):
                     break
                 else:
                     nolist_cp.remove(num)
+
             table[row+i][col+j] = num
+            #print("\n {} placed in {},{}".format(num,row+i,col+j))
             nolist.remove(num)
             nolist_cp = nolist
 
@@ -32,7 +37,9 @@ def unUsedNum(table,row,col,num):
     for i in range(3):
         for j in range(3):
             if table[row+i][col+j] == num:
+                #print("\n num = {} found in {},{}, hence can't be placed in this cell".format(num,row+i,col+j))
                 return False
+    #print("\n num = {} can be safely placed".format(num))
     return True
 
 #For filling up the remaining cells
@@ -85,7 +92,7 @@ def checkSafe(table,i,j,num):
 
 #if __name__ == "__main__": #Only if this script needs to run
 def sudokuGridGen():
-    table = [[0 for _ in range(9)] for _ in range(9)] #Should initialize a list of lists with all elements as 0
+    table = [[0 for i in range(9)] for i in range(9)] #Should initialize a list of lists with all elements as 0
 
     table = initCellGen(table)
 
