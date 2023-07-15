@@ -19,6 +19,7 @@
 
 import sudokuGridGen as sgg
 from sudokuSolver import sudokuSolver
+from copy import deepcopy
 
 def printGrid(table):
     for row in table:
@@ -50,10 +51,11 @@ if __name__ == "__main__":
         
     sol = sgg.sudokuGridGen() #This variable is our solution
 
+    """
     #For printing the solution grid, use only in terminal
     print("\n OUR SOLUTION")
     printGrid(sol)
-
+    """
 
     if diff == 1:
          noOfClues = sgg.random.randint(35,45)
@@ -64,16 +66,49 @@ if __name__ == "__main__":
     else:
         noOfClues = sgg.random.randint(17,24)
 
-    puzzle = randCellDelete(sol,noOfClues) #This variable is our puzzle
+    original = []
+    while True:
+        counter = 0
+        puzzle = randCellDelete(sol,noOfClues) #This variable is our puzzle
+        
+        original = deepcopy(puzzle)
 
-    #For printing the puzzle grid, use only in terminal
-    print("\n OUR PUZZLE")
-    printGrid(puzzle)
+        while True: #Attempt at Creating a unique solution puzzle
+            if counter == 20:
+                break
+            
+            """
+            #For printing the puzzle grid, use only in terminal
+            print("\n OUR PUZZLE")
+            printGrid(puzzle)
+            """
 
-    #Solving our puzzle
-    sudokuSolver(puzzle)
+            #Solving our puzzle
+            sudokuSolver(puzzle)
 
-    print("\n OUR SOLVED PUZZLE")
-    printGrid(puzzle)
-    
+            """
+            #For printing the solved puzzle grid
+            print("\n OUR SOLVED PUZZLE")
+            printGrid(puzzle)
+            """
 
+            if puzzle != sol:
+                #print("\n Does not give unique solution")
+                break
+
+            puzzle = deepcopy(original)
+            """
+            print("\n Should copy the original puzzle")
+            printGrid(puzzle)
+            """
+
+            counter += 1
+
+        if counter == 20: #Means it gives a unique solution everytime
+            print("\n A unique solution grid")
+            printGrid(original)
+            print("\n The solution to this grid")
+            printGrid(sol)
+            break
+        #else:
+            #print("\n Is not a unique solution grid")

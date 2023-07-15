@@ -12,7 +12,7 @@ def initCellGen(table):
 #Would generate the diagonal cells
 def initFillCell(table,row,col): 
     nolist = [1,2,3,4,5,6,7,8,9]
-    nolist_cp = nolist
+    nolist_cp = nolist.copy()
     for i in range(3):
         for j in range(3):
             while True:
@@ -29,7 +29,7 @@ def initFillCell(table,row,col):
             table[row+i][col+j] = num
             #print("\n {} placed in {},{}".format(num,row+i,col+j))
             nolist.remove(num)
-            nolist_cp = nolist
+            nolist_cp = nolist.copy()
 
 
 #Should check for all numbers in particular cell
