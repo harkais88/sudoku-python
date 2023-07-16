@@ -15,15 +15,26 @@
 
     However, this may not be a guarentee that a good Sudoku Puzzle is generated. Need to develop 
     a sudoku solver that can solve the generated puzzle using logic only, and would score the puzzle if it is good. The puzzle would be best if it only has 1 solution.
+    Edit: Successfully made a Sudoku Solver, and successfully used it to generate unique solution puzzle grids
 """
 
 import sudokuGridGen as sgg
 from sudokuSolver import sudokuSolver
 from copy import deepcopy
+import playsound as pls
 
 def printGrid(table):
-    for row in table:
-        print("\n",row)
+    for i in range(len(table)):
+        if i % 3 == 0 and i != 0:
+            print(" - - - - - - - - - - - -")
+        for j in range(len(table[i])):
+            if j % 3 == 0 and j != 0:
+                print(" | ", end="")
+            if table[i][j] != 0:
+                print(" " + str(table[i][j]),end = "")
+            else:
+                print("  ",end = "")
+        print()
 
 #Should Delete Random Cells from Grid
 def randCellDelete(sol,noOfClues):
@@ -39,24 +50,17 @@ def randCellDelete(sol,noOfClues):
         counter += 1
     return sol
 
-#Main Purpose here: Create a generic terminal Sudoku Game :)
-#Execute this script when testing for game generation
-if __name__ == "__main__":
+def diffInput():
     chck = 0
     while chck < 1 or chck > 4:
         diff = int(input("\n CHOOSE YOUR DIFFICULITY: 1)EASY 2)MEDIUM 3)HARD 4)IMPOSSIBLE: "))
         if diff < 1 or diff > 4:
             print("\n Try entering the number")
         chck = diff
-        
-    sol = sgg.sudokuGridGen() #This variable is our solution
 
-    """
-    #For printing the solution grid, use only in terminal
-    print("\n OUR SOLUTION")
-    printGrid(sol)
-    """
+    return diff
 
+def diffSet(diff):
     if diff == 1:
          noOfClues = sgg.random.randint(35,45)
     elif diff == 2:
@@ -65,6 +69,21 @@ if __name__ == "__main__":
         noOfClues = sgg.random.randint(25,30)
     else:
         noOfClues = sgg.random.randint(17,24)
+
+    return noOfClues
+
+def sudokuGameGen():
+    diff = diffInput()        
+
+    noOfClues = diffSet(diff)
+
+    sol = sgg.sudokuGridGen() #This variable is our solution
+
+    """
+    #For printing the solution grid, use only in terminal
+    print("\n OUR SOLUTION")
+    printGrid(sol)
+    """
 
     original = []
     while True:
@@ -105,10 +124,27 @@ if __name__ == "__main__":
             counter += 1
 
         if counter == 20: #Means it gives a unique solution everytime
-            print("\n A unique solution grid")
-            printGrid(original)
-            print("\n The solution to this grid")
-            printGrid(sol)
+            #print("\n A unique solution grid")
+            #printGrid(original)
+            pls.playsound('content/music/start.mp3',block=False)
+            
+            return original,sol,noOfClues #This function returns a tuple of the puzzle and the solution
+
+            #print("\n The solution to this grid")
+            #printGrid(sol)
+
             break
         #else:
             #print("\n Is not a unique solution grid")
+
+#Main Purpose here: Create a generic terminal Sudoku Game :)
+#Execute this script when testing for game generation
+if __name__ == "__main__":
+    original,sol = sudokuGameGen()
+
+    print("\n Puzzle Grid")
+    printGrid(original)
+    print("\n Solution")
+    printGrid(sol)
+
+
