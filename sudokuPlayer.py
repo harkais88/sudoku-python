@@ -7,7 +7,8 @@
 #IMP NOTE: THIS SERVES AS THE PROTOTYPE TO THE MAIN SUDOKU GAME THAT IS TO BE CREATED IN PYGAME. THAT BEING SAID, HAVE FUN WITH THIS ONE. 
 #THIS WILL BE CONSIDERED THE BASIS OF v1.0
 
-from sudokuGameGen import sudokuGameGen,printGrid,sgg
+from sudokuGameGen import sudokuGameGen,diffInput,printGrid,sgg,Fore,Style,deepcopy
+from colorama import Back
 import os
 import keyboard
 #from sys import exit
@@ -81,9 +82,11 @@ if __name__ == "__main__":
     
     threading.Thread(target=bgm, daemon=True).start() #For playing the background music
 
-    print(art.text2art("SUDOKU!!",font="epic"))
-    puzzle,sol,noOfClues = sudokuGameGen()
+    print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
+    diff = diffInput()
+    puzzle,sol,noOfClues = sudokuGameGen(diff)
     nolist = [i for i in range(0,9)]
+    original = deepcopy(puzzle)
 
     error_counter = 0
     
@@ -104,8 +107,8 @@ if __name__ == "__main__":
                 print("\n On a roll man, current streak: {} \n".format(streak))
 
             #os.system('clear')
-            print(art.text2art("SUDOKU!!",font="epic"))
-            printGrid(puzzle)
+            print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
+            printGrid(puzzle,original)
             print("\n Numbers Left! : ",end="")
             for i in [1,2,3,4,5,6,7,8,9]:
                 if numbers_left(i,puzzle) == False:
@@ -155,7 +158,7 @@ if __name__ == "__main__":
                     pls.playsound('content/music/ding.mp3',block=False)
                     print("\n {} \n".format(sgg.random.choice(remarks)))
 
-        printGrid(puzzle)
+        printGrid(puzzle,original)
         if filledGrid(puzzle) == True:
             pls.playsound('content/music/success.mp3')
             print("\n Congratulations!! Puzzle solved!")

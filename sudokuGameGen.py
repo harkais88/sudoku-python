@@ -22,18 +22,31 @@ import sudokuGridGen as sgg
 from sudokuSolver import sudokuSolver
 from copy import deepcopy
 import playsound as pls
+from colorama import Fore
+from colorama import Style
+import threading
+import sys
+import time
 
-def printGrid(table):
+def printGrid(table,original = []):
     for i in range(len(table)):
         if i % 3 == 0 and i != 0:
             print(" - - - - - - - - - - - -")
         for j in range(len(table[i])):
             if j % 3 == 0 and j != 0:
                 print(" | ", end="")
-            if table[i][j] != 0:
-                print(" " + str(table[i][j]),end = "")
+            if not original:
+                if table[i][j] != 0:
+                    print(" " + Fore.BLUE + str(table[i][j]) + Style.RESET_ALL,end = "")
+                else:
+                    print("  ",end = "")
             else:
-                print("  ",end = "")
+                if table[i][j] != 0 and table[i][j] != original[i][j]:
+                    print(" " + Fore.GREEN + str(table[i][j]) + Style.RESET_ALL,end = "")
+                elif table[i][j] != 0:
+                    print(" " + Fore.BLUE + str(table[i][j]) + Style.RESET_ALL,end = "")
+                else:
+                    print("  ",end = "")
         print()
 
 #Should Delete Random Cells from Grid
@@ -72,70 +85,90 @@ def diffSet(diff):
 
     return noOfClues
 
-def sudokuGameGen():
-    diff = diffInput()        
+def loading():
+    animation = animation = ["[■□□□□□□□□□]","[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
+    counter = 0
+    while True:
+        time.sleep(0.2)
+        sys.stdout.write("\r"+ animation[counter % len(animation)])
+        sys.stdout.flush()
+        counter += 1
+
+
+def sudokuGameGen(diff):
+    #diff = diffInput()        
 
     noOfClues = diffSet(diff)
 
     sol = sgg.sudokuGridGen() #This variable is our solution
 
-    """
     #For printing the solution grid, use only in terminal
-    print("\n OUR SOLUTION")
-    printGrid(sol)
-    """
+    #print("\n OUR SOLUTION")
+    #printGrid(sol)
 
+    #threading.Thread(target = loading,block=False)
+    u_count = 0 #For optimizing unique solution grid gen
     original = []
-    while True:
-        counter = 0
-        puzzle = randCellDelete(sol,noOfClues) #This variable is our puzzle
+    try:
+        while u_count < 20:
+            counter = 0
+            puzzle = randCellDelete(sol,noOfClues) #This variable is our puzzle
         
-        original = deepcopy(puzzle)
+            original = deepcopy(puzzle)
 
-        while True: #Attempt at Creating a unique solution puzzle
-            if counter == 20:
-                break
+            while True: #Attempt at Creating a unique solution puzzle
+                if counter == 20:
+                    break
             
-            """
-            #For printing the puzzle grid, use only in terminal
-            print("\n OUR PUZZLE")
-            printGrid(puzzle)
-            """
+                """
+                #For printing the puzzle grid, use only in terminal
+                print("\n OUR PUZZLE")
+                printGrid(puzzle)
+                """
+                
+                #Solving our puzzle
+                sudokuSolver(puzzle)
 
-            #Solving our puzzle
-            sudokuSolver(puzzle)
+                """
+                #For printing the solved puzzle grid
+                print("\n OUR SOLVED PUZZLE")
+                printGrid(puzzle)
+                """
 
-            """
-            #For printing the solved puzzle grid
-            print("\n OUR SOLVED PUZZLE")
-            printGrid(puzzle)
-            """
+                if puzzle != sol:
+                    #print("\n Does not give unique solution")
+                    break
 
-            if puzzle != sol:
-                #print("\n Does not give unique solution")
-                break
+                puzzle = deepcopy(original)
+                """
+                print("\n Should copy the original puzzle")
+                printGrid(puzzle)
+                """
 
-            puzzle = deepcopy(original)
-            """
-            print("\n Should copy the original puzzle")
-            printGrid(puzzle)
-            """
+                counter += 1
 
-            counter += 1
+            if counter == 20: #Means it gives a unique solution everytime
+                #print("\n A unique solution grid")
+                #printGrid(original)
+                pls.playsound('content/music/start.mp3',block=False)
+                #threading.Event().set()
+                return original,sol,noOfClues #This function returns a tuple of the puzzle and the solution
 
-        if counter == 20: #Means it gives a unique solution everytime
-            #print("\n A unique solution grid")
-            #printGrid(original)
-            pls.playsound('content/music/start.mp3',block=False)
-            
-            return original,sol,noOfClues #This function returns a tuple of the puzzle and the solution
+                #print("\n The solution to this grid")
+                #printGrid(sol)
 
-            #print("\n The solution to this grid")
-            #printGrid(sol)
+            #else:
+                #print("\n Is not a unique solution grid")
 
-            break
-        #else:
-            #print("\n Is not a unique solution grid")
+            u_count += 1
+            #print("\n u_count increased to ",u_count)
+    except KeyboardInterrupt:
+        print("I am so sorry for the trouble, if you wish, there is a good chance it will generate a good one upon re-execution. Otherwise, feel free to try out the medium or easy puzzles. Again, I am very sorry for this :(")
+
+
+    if u_count == 20: #Meaning it was not able to produce a unique puzzle grid with current solution grid
+        #print("\n Retrying with different solution grid")
+        return sudokuGameGen(diff) #In that case, we run the same loop again
 
 #Main Purpose here: Create a generic terminal Sudoku Game :)
 #Execute this script when testing for game generation
