@@ -15,6 +15,9 @@ import keyboard
 import threading 
 import art
 import playsound as pls
+import time
+import sys
+import itertools
 
 hint_chck = False
 
@@ -69,12 +72,28 @@ def numbers_left(num,puzzle):
         return True
     return False
 
+def loading(stop_loading):
+    animation = ["■□□□□□□□□□]","■■□□□□□□□□]", "■■■□□□□□□□]", "■■■■□□□□□□]", "■■■■■□□□□□]", "■■■■■■□□□□]", "■■■■■■■□□□]", "■■■■■■■■□□]", "■■■■■■■■■□]", "■■■■■■■■■■]"]
+    counter = 0
+    print("\n Loading ")
+    for c in itertools.cycle(animation):
+        if not stop_loading.is_set(): 
+            sys.stdout.flush() 
+            sys.stdout.write("\r "+ animation[counter % len(animation)])
+            sys.stdout.flush()
+            counter += 1
+            time.sleep(0.2)
+    #os.system('clear')
+    #sys.stdout.flush()
+       
 
 def bgm(): 
     music = ['content/music/bgm.mp3', 'content/music/bgm2.mp3', 'content/music/bgm3.mp3', 'content/music/bgm4.mp3']
     while True:
         pls.playsound(sgg.random.choice(music))    
     
+stop_loading = threading.Event()
+loading = threading.Thread(target = loading, args=(stop_loading,), daemon=True)
 
 if __name__ == "__main__":
     #Generate puzzle and solution to puzzle
@@ -84,7 +103,8 @@ if __name__ == "__main__":
 
     print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
     diff = diffInput()
-    puzzle,sol,noOfClues = sudokuGameGen(diff)
+    loading.start()
+    puzzle,sol,noOfClues = sudokuGameGen(diff,stop_loading)
     nolist = [i for i in range(0,9)]
     original = deepcopy(puzzle)
 
@@ -95,6 +115,7 @@ if __name__ == "__main__":
     score = 0
 
     os.system('clear')
+    #print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
     try:
         while filledGrid(puzzle) == False:
 

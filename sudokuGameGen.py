@@ -26,7 +26,7 @@ from colorama import Fore
 from colorama import Style
 import threading
 import sys
-import time
+import os
 
 def printGrid(table,original = []):
     for i in range(len(table)):
@@ -85,19 +85,9 @@ def diffSet(diff):
 
     return noOfClues
 
-def loading():
-    animation = animation = ["[■□□□□□□□□□]","[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
-    counter = 0
-    while True:
-        time.sleep(0.2)
-        sys.stdout.write("\r"+ animation[counter % len(animation)])
-        sys.stdout.flush()
-        counter += 1
-
-
-def sudokuGameGen(diff):
+def sudokuGameGen(diff,stop_loading):
     #diff = diffInput()        
-
+    
     noOfClues = diffSet(diff)
 
     sol = sgg.sudokuGridGen() #This variable is our solution
@@ -106,7 +96,6 @@ def sudokuGameGen(diff):
     #print("\n OUR SOLUTION")
     #printGrid(sol)
 
-    #threading.Thread(target = loading,block=False)
     u_count = 0 #For optimizing unique solution grid gen
     original = []
     try:
@@ -150,8 +139,10 @@ def sudokuGameGen(diff):
             if counter == 20: #Means it gives a unique solution everytime
                 #print("\n A unique solution grid")
                 #printGrid(original)
+                stop_loading.set()
+                sys.stdout.flush()
                 pls.playsound('content/music/start.mp3',block=False)
-                #threading.Event().set()
+                os.system('clear')
                 return original,sol,noOfClues #This function returns a tuple of the puzzle and the solution
 
                 #print("\n The solution to this grid")
@@ -162,13 +153,13 @@ def sudokuGameGen(diff):
 
             u_count += 1
             #print("\n u_count increased to ",u_count)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt,TypeError):
         print("I am so sorry for the trouble, if you wish, there is a good chance it will generate a good one upon re-execution. Otherwise, feel free to try out the medium or easy puzzles. Again, I am very sorry for this :(")
 
 
     if u_count == 20: #Meaning it was not able to produce a unique puzzle grid with current solution grid
         #print("\n Retrying with different solution grid")
-        return sudokuGameGen(diff) #In that case, we run the same loop again
+        return sudokuGameGen(diff,stop_loading) #In that case, we run the same loop again
 
 #Main Purpose here: Create a generic terminal Sudoku Game :)
 #Execute this script when testing for game generation
