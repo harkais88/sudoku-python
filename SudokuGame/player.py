@@ -1,45 +1,51 @@
+#Main Player Code
+#Note: Right now, it only shows up with 1 game. Should add a main menu, check button, reset button, mistake counter,
+#timer, pause option, and some music maybe, along with a bit of art for the game
+
 #!/usr/bin/python3
 
 import pygame
 import RSudoku
 import sys
 import numpy as np
-from time import sleep
+from time import sleep # Using it for now, used only in testing
 from copy import deepcopy
 
 class Game:
     def __init__(self,diff):
         pygame.init()
-        self.width = 600
-        self.background_fill = (242,242,242)
+        self.width = 600 # Width of our screen
+        self.background_fill = (242,242,242) # Background Fill
         self.screen = pygame.display.set_mode((self.width,self.width))
         self.screen.fill(self.background_fill) 
-        self.running = True
+        self.running = True 
         self.clock = pygame.time.Clock()
-        self.game = RSudoku.sudoku(diff)
+        self.game = RSudoku.sudoku(diff) # Intializing game variable, has the grid and puzzle as attributes
         self.p = 493 / 9 #Obtained by Trial and Error
         self.i = self.j = 10 #Used for validating mouse pos and entering values
         self.value = "0" #Used for intialising entry value
         self.flag = 0 # Used for checking selected cell coloring
-        self.solution = deepcopy(self.game.puzzle)
+        self.solution = deepcopy(self.game.puzzle) #Used for end game check
 
     def run(self):
+        """Responsible for running the game"""
         while self.running == True:
             self.handle_event()
             self.draw()
             # Win Event
             if np.all(np.equal(self.solution,self.game.grid)):
                 print("Game Solved!!!")
-                win = self.screen.blit(pygame.font.SysFont("Comic Sans MS", 30).render("YOU WON THE GAME!!!", True, (0, 255, 0)),
-                                (15,self.width - self.p + 10))
+                win = self.screen.blit(pygame.font.SysFont("Comic Sans MS", 30).render("YOU WON THE GAME!!!", 
+                                        True, (0, 255, 0)), (15,self.width - self.p + 10))
                 pygame.display.update(win) 
                 # For Testing purpose, remove later
                 sleep(2)
-                self.quit()
+                self.running = False
             self.clock.tick(60)
         self.quit()
 
     def handle_event(self):
+        """Responsible for handling all valid events"""
         for event in pygame.event.get():
                 # Quit Event
                 if event.type == pygame.QUIT:
@@ -47,9 +53,11 @@ class Game:
                 # Getting Mouse Position Data
                 if event.type == pygame.MOUSEBUTTONUP:
                     pos = pygame.mouse.get_pos()
+                    # Checks whether mouse click was within grid
                     if (self.p < pos[0] < self.width - self.p) and (self.p < pos[1] < self.width - self.p):
                         self.i,self.j = int(pos[1]//self.p), int(pos[0]//self.p)                      
                     try:
+                        # Checks whether selected cell is a part of original puzzle or not
                         if self.game.puzzle[self.i-1][self.j-1] != 0:
                             self.flag = 0
                             self.i,self.j = 10,10
@@ -57,6 +65,7 @@ class Game:
                             self.flag = 1
                     except IndexError:
                         pass
+                # Taking Input From Keyboard
                 if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10):
                     self.value = "0"
                     if event.key == pygame.K_1:
@@ -79,6 +88,7 @@ class Game:
                         self.value = "9"                
 
     def draw(self):
+        """Responsible for drawing at every frame"""
         # Drawing the lines
         for i in range(10):
             if i % 3 == 0: line_width = 4;
@@ -108,11 +118,13 @@ class Game:
 
         # Coloring Selected Cell
         if self.flag == 1:
-            # The worst way to clear a selected cell :(
+            # The worst way to clear a already selected cell :(
+            # Could probably fix this if the previous selected cell coords are recorded, will do this later
             for i in range(int(self.p), int(self.width - self.p)):
                 for j in range(int(self.p), int(self.width - self.p)):
                     if self.screen.get_at((i,j)) == sel_color:
                         self.screen.set_at((i,j),self.background_fill)
+            # Providing Selection Color to Selected Cell
             selector = pygame.Surface((self.p,self.p))
             selector.fill(sel_color)
             self.screen.blit(selector, (self.j*self.p, self.i*self.p))
@@ -145,10 +157,13 @@ class Game:
             self.value = "0"
     
     def quit(self):
+        """Quits the Game"""
         pygame.quit()
         sys.exit()
 
 if __name__ == "__main__":
-    game = Game(1) #Working with a 9x9 grid for now
+    # For now, it only works with a sudoku grid with 35-46 clues present
+    # After Main Menu Implementation, should give the player the option to choose other difficulities
+    game = Game(1)
     game.run()
     
