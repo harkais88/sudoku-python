@@ -17,6 +17,7 @@ class Game:
         self.width = 600 # Width of our screen
         self.background_fill = (242,242,242) # Background Fill
         self.screen = pygame.display.set_mode((self.width,self.width))
+        pygame.display.set_caption("Pydoku")
         self.screen.fill(self.background_fill) 
         self.running = True 
         self.clock = pygame.time.Clock()
@@ -59,11 +60,11 @@ class Game:
                     if self.start == False:
                         # If Quit Button is pressed
                         if self.width // 2 - self.p < pos[0] < self.width // 2 + self.p and \
-                            self.width // 2 + self.p < pos[1] < self.width // 2 + 3*self.p:
+                            self.width // 2 + self.p < pos[1] < self.width // 2 + 2*self.p:
                             self.quit()
                         # If START Button is pressed
                         if self.width // 2 - self.p < pos[0] < self.width // 2 + self.p and \
-                                self.width //2 - self.p < pos[1] < self.width // 2 + self.p:
+                                self.width //2 - self.p < pos[1] < self.width // 2 :
                             self.start = True
                             self.start_flag = 1
                     # Checks whether mouse click was within grid
@@ -105,28 +106,35 @@ class Game:
         if self.start == False:
             # Main Menu
             main_font = pygame.font.SysFont("Comic Sans MS",30)
+            main_title_font = pygame.font.Font(".\content\Fonts\Copperplate.ttf", 100)
+
+            # Main Title
+            main_title = main_title_font.render("PYDOKU",True,(52, 235, 177))
+            self.screen.blit(main_title, (self.p+(0.5*self.p),self.p))
 
             # Start Button Operations
             start_text = main_font.render("START",True,(255,0,0))
             pygame.draw.rect(self.screen, (0,0,0), 
-                             (self.width // 2 - self.p, self.width // 2 - self.p, 2*self.p, self.p))
+                             (self.width // 2 - self.p, self.width // 2 - self.p, 2*self.p, self.p),2)
             self.screen.blit(start_text, (self.width // 2 - self.p + 2, self.width // 2 - self.p + 2))
 
             # Quit Button Operations
             quit_text = main_font.render("QUIT",True,(255,0,0))
             pygame.draw.rect(self.screen, (0,0,0), 
-                             (self.width // 2 - self.p, self.width // 2 + self.p, 2*self.p, self.p))
+                             (self.width // 2 - self.p, self.width // 2 + self.p, 2*self.p, self.p),2)
             self.screen.blit(quit_text, (self.width // 2 - self.p + 10, self.width // 2 + self.p + 2))
             pygame.display.update()
         else:
             if self.start_flag == 1:
                 # If Start Button is pressed, we remove the Main Screen Buttons
                 # The flag is given so that this does not happen for every frame
+                rmv_title = pygame.draw.rect(self.screen, self.background_fill,
+                            (0,0,self.width,self.width//2))
                 rmv_start = pygame.draw.rect(self.screen, self.background_fill, 
                             (self.width // 2 - self.p, self.width // 2 - self.p, 2*self.p, self.p))
                 rmv_quit = pygame.draw.rect(self.screen, self.background_fill,
                             (self.width // 2 - self.p, self.width // 2 + self.p, 2*self.p, self.p))
-                pygame.display.update([rmv_start,rmv_quit])
+                pygame.display.update([rmv_start,rmv_quit,rmv_title])
                 self.start_flag = 0
             # Drawing the lines
             for i in range(10):
@@ -153,7 +161,7 @@ class Game:
 
             # Instruction
             inst = num_font.render("Select, Then Enter Number", True, (9,23,46))
-            self.screen.blit(inst,(0,0))
+            self.screen.blit(inst,(15,5))
 
             # Coloring Selected Cell
             if self.flag == 1:
@@ -167,6 +175,9 @@ class Game:
                 selector = pygame.Surface((self.p,self.p))
                 selector.fill(sel_color)
                 self.screen.blit(selector, (self.j*self.p, self.i*self.p))
+                if self.solution[self.i-1][self.j-1] != 0:
+                    selected_cell_val = num_font.render(str(self.solution[self.i-1][self.j-1]),True,num_color)
+                    self.screen.blit(selected_cell_val,((self.j)*self.p + 20, (self.i)*self.p + 5))
                 self.flag = 0
 
             # Rendering the puzzle
