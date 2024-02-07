@@ -23,9 +23,13 @@ class sudoku:
     """
 
     def __init__(self,choice = 1):
-        self.grid = self.initGrid()
-        self.choice = choice
-        self.uniquePuzzle()
+        if choice == 0:
+            self.grid = np.empty([9,9])
+            self.puzzle = np.empty([9,9])
+        else:
+            self.grid = self.initGrid()
+            self.choice = choice
+            self.uniquePuzzle()
 
     @staticmethod
     def diffSet(choice: int):
