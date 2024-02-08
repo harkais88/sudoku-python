@@ -160,7 +160,6 @@ class Game:
                         pygame.display.update()
                     if event.key == pygame.K_q: #Quit Event
                         self.quit()
-              
 
     def draw(self):
         """Responsible for drawing at every frame"""
@@ -235,6 +234,11 @@ class Game:
             
             if self.sel_diff != 0:
                 # Intializing game variable, has the grid and puzzle as attributes
+                pygame.draw.rect(self.screen, self.background_fill,
+                                (self.p-10,self.p-10,self.width - (2*(self.p - 10)),self.width - (2*(self.p - 10))))
+                self.screen.blit(pygame.font.SysFont("Comic Sans Ms",25).render("LOADING GAME",True,(0,0,0)),
+                                 (self.width//2 - self.p - 30,self.width//2 - (self.p//2)))
+                pygame.display.update()
                 self.game = RSudoku.sudoku(self.sel_diff)
                 self.solution = deepcopy(self.game.puzzle) #Used for end game check
 
