@@ -1,5 +1,5 @@
 #Main Player Code
-#Note: Right now, it only shows up with 1 game. Should add a main menu, check button, reset button, mistake counter,
+#Note: Right now, it only shows up with 1 game. Should add a check button, mistake counter,
 #timer, pause option, and some music maybe, along with a bit of art for the game
 #Should add a loading screen, and animation for a lose or win event to get rid of missing value bug
 
@@ -36,6 +36,7 @@ class Game:
         # To avoid the chance that empty solution is equal to empty grid
         while np.all(np.equal(self.solution,self.game.grid)): self.solution = np.empty([9,9]);
         self.error_count = 0 #Used for recording number of errors, after 5 times game will end
+        self.frame_count = 0 #Used for timer
 
     def run(self):
         """Responsible for running the game"""
@@ -151,12 +152,14 @@ class Game:
                         self.solution = deepcopy(self.game.puzzle)
                         if self.error_count == 5: self.error_count = 0;
                         self.screen.fill(self.background_fill)
+                        self.frame_count = 0
                         pygame.display.update()
                     if event.key == pygame.K_n: #New Game Event
                         if self.error_count == 5: self.error_count = 0;
                         self.game = RSudoku.sudoku(0)
                         self.diff_flag = 1
                         self.screen.fill(self.background_fill)
+                        self.frame_count = 0
                         pygame.display.update()
                     if event.key == pygame.K_q: #Quit Event
                         self.quit()
@@ -273,8 +276,17 @@ class Game:
                 err_color = (247,27,20)
 
                 # Instruction
-                inst = num_font.render("Select Cell, Enter Number", True, (9,23,46))
+                inst = num_font.render("Select Cell, Enter Number", True, ori_num_color)
                 self.screen.blit(inst,(15,5))
+
+                # Timer
+                time = num_font.render(f"Time: {(self.frame_count//60)//60}:{(self.frame_count//60)%60}",
+                                       True, ori_num_color)
+                self.frame_count += 1
+                time_blank = pygame.draw.rect(self.screen,self.background_fill,(self.width-(3*self.p),0,3*self.p,self.p-3))
+                pygame.display.update(time_blank)
+                time_display = self.screen.blit(time,(self.width-(3*self.p),5))
+                pygame.display.update(time_display)
 
                 # Coloring Selected Cell
                 if self.sel_flag == 1:
