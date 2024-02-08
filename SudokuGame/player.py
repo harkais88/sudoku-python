@@ -1,7 +1,7 @@
 #Main Player Code
 #Note: Right now, it only shows up with 1 game. Should add a main menu, check button, reset button, mistake counter,
 #timer, pause option, and some music maybe, along with a bit of art for the game
-#Should add a loading screen
+#Should add a loading screen, and animation for a lose or win event to get rid of missing value bug
 
 #!/usr/bin/python3
 
@@ -9,7 +9,7 @@ import pygame
 import RSudoku
 import sys
 import numpy as np
-from time import sleep # Using it for now, used only in testing
+from time import sleep
 from copy import deepcopy
 
 class Game:
@@ -34,25 +34,51 @@ class Game:
         self.sel_flag = 0 # Used for checking selected cell coloring
         self.sel_i = self.sel_j = 10 # Used for storing previous selected cell
         self.solution = np.empty([9,9]) # Initializing an empty array that will be used for endgame
+        # To avoid the chance that empty solution is equal to empty grid
+        while np.all(np.equal(self.solution,self.game.grid)): self.solution = np.empty([9,9]);
+        self.error_count = 0 #Used for recording number of errors, after 5 times game will end
 
     def run(self):
         """Responsible for running the game"""
         while self.running == True:
             self.handle_event()
-            self.draw()
-            # Win Event
-            if np.all(np.equal(self.solution,self.game.grid)):
-                win = self.screen.blit(pygame.font.SysFont("Comic Sans MS", 30).render("YOU WON THE GAME!!!", 
-                                        True, (0, 255, 0)), (15,self.width - self.p + 10))
-                pygame.display.update(win) 
-                # For Testing purpose, remove later
-                sleep(2)
-                self.running = False        
+            self.draw()  
             self.clock.tick(60)
         self.quit()
 
     def handle_event(self):
         """Responsible for handling all valid events"""
+            
+        # After Lose or Win Event, I should give option to quit or new game or reset the game if lost
+        # Lose Event
+        if self.error_count == 5:
+            lose_txt = "YOU LOST THE GAME\nPress R to Reset\nPress N for a New Game\nPress Q to Quit".split("\n")
+            # Lose Screen Made from T&E
+            self.screen.fill(self.background_fill)
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf", 40).render(lose_txt[0],
+                        True, (232, 50, 50)), (self.width//2-self.p-170,self.width//2-self.p))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(lose_txt[1],
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(lose_txt[2],
+                        True, (232, 50, 50)), (self.width//2 - self.p-127,self.width//2 + self.p))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(lose_txt[3],
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p)))                                           
+            pygame.display.update()
+
+        # Win Event
+        if np.all(np.equal(self.solution,self.game.grid)):
+            win_txt = "YOU WON THE GAME!!!\nPress R to Restart\nPress N for a New Game\nPress Q to Quit".split("\n")
+            self.screen.fill(self.background_fill)
+            self.screen.blit(pygame.font.SysFont("Comic Sans MS", 30).render(win_txt[0], 
+                        True, (0, 255, 0)), (self.width//4,self.width//2-self.p))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(win_txt[1],
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(win_txt[2],
+                        True, (232, 50, 50)), (self.width//2 - self.p-127,self.width//2 + self.p))
+            self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(win_txt[3],
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p))) 
+            pygame.display.update()       
+            
         for event in pygame.event.get():
                 # Quit Event
                 if event.type == pygame.QUIT:
@@ -98,7 +124,8 @@ class Game:
                     except (IndexError, AttributeError):
                         pass
                 # Taking Input From Keyboard
-                if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10):
+                if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10) \
+                    and self.sel_diff != 0 and self.main_flag == 0:
                     self.value = "0"
                     if event.key == pygame.K_1:
                         self.value = "1"
@@ -117,7 +144,20 @@ class Game:
                     if event.key == pygame.K_8:
                         self.value = "8"
                     if event.key == pygame.K_9:
-                        self.value = "9"                
+                        self.value = "9"
+                    if event.key == pygame.K_r: #Reset Event
+                        self.solution = deepcopy(self.game.puzzle)
+                        if self.error_count == 5: self.error_count = 0;
+                        self.screen.fill(self.background_fill)
+                        pygame.display.update()
+                    if event.key == pygame.K_n: #New Game Event
+                        if self.error_count == 5: self.error_count = 0;
+                        self.game = RSudoku.sudoku(0)
+                        self.diff_flag = 1
+                        self.screen.fill(self.background_fill)
+                        pygame.display.update()
+                    if event.key == pygame.K_q: #Quit Event
+                        pygame.quit()               
 
     def draw(self):
         """Responsible for drawing at every frame"""
@@ -161,29 +201,29 @@ class Game:
                 diff_text_color = (168, 50, 78)
 
                 # Diff Choice Container
-                diff_main_rect = pygame.draw.rect(self.screen, self.background_fill,
+                pygame.draw.rect(self.screen, self.background_fill,
                                 (self.p-10,self.p-10,self.width - (2*(self.p - 10)),self.width - (2*(self.p - 10))))
                 
                 # Easy Diff Button
-                easy_diff_button = pygame.draw.rect(self.screen, self.background_fill_alt,
+                pygame.draw.rect(self.screen, self.background_fill_alt,
                                 (2*self.p,2*self.p,self.width - 4*self.p,self.p),width=2)
                 easy_text = diff_font.render("EASY",True,diff_text_color)
                 self.screen.blit(easy_text,(self.width//2 - self.p,2*self.p+10))
 
                 # Medium Diff Button
-                med_diff_button = pygame.draw.rect(self.screen, self.background_fill_alt,
+                pygame.draw.rect(self.screen, self.background_fill_alt,
                                 (2*self.p,4*self.p,self.width - 4*self.p,self.p),width=2)
                 med_text = diff_font.render("MEDIUM",True,diff_text_color)
                 self.screen.blit(med_text,(self.width//2 - ((3*self.p)//2)-6,4*self.p+10))
 
                 # Hard Diff Button
-                hard_diff_button = pygame.draw.rect(self.screen, self.background_fill_alt,
+                pygame.draw.rect(self.screen, self.background_fill_alt,
                                 (2*self.p,6*self.p,self.width - 4*self.p,self.p),width=2)
                 hard_text = diff_font.render("HARD",True,diff_text_color)
                 self.screen.blit(hard_text,(self.width//2 - self.p,6*self.p+10))
 
                 # Impossible Diff Button
-                imp_diff_button = pygame.draw.rect(self.screen, self.background_fill_alt,
+                pygame.draw.rect(self.screen, self.background_fill_alt,
                                 (2*self.p,8*self.p,self.width - 4*self.p,self.p),width=2)
                 imp_text = diff_font.render("IMPOSSIBLE",True,diff_text_color)
                 self.screen.blit(imp_text,(self.width//2 - 2*self.p - 15,8*self.p+10))
@@ -191,10 +231,11 @@ class Game:
                 pygame.display.update()
             
             if self.sel_diff != 0:
-                self.game = RSudoku.sudoku(self.sel_diff) # Intializing game variable, has the grid and puzzle as attributes
+                # Intializing game variable, has the grid and puzzle as attributes
+                self.game = RSudoku.sudoku(self.sel_diff)
                 self.solution = deepcopy(self.game.puzzle) #Used for end game check
-            
-            if self.diff_flag == 0:
+
+            if self.diff_flag == 0 and self.error_count != 5 and not np.all(np.equal(self.solution,self.game.grid)):
                 if self.sel_diff != 0:
                     self.screen.fill(self.background_fill)
                     pygame.display.update()
@@ -218,7 +259,9 @@ class Game:
                 # Setting Font Style And Colors
                 num_font = pygame.font.SysFont("Comic Sans MS",30) # Setting Font of the Numbers
                 sel_color = (177,232,237)
-                num_color = (56,123,232)
+                entry_num_color = (56,123,232)
+                ori_num_color = (9,23,46)
+                # Following colors will be used when check button is given
                 sol_color = (19,214,120)
                 err_color = (247,27,20)
 
@@ -234,15 +277,20 @@ class Game:
                                                         (self.sel_j*self.p,self.sel_i*self.p,self.p,self.p))
                         pygame.display.update(rmv_sel_cell)
                         if self.solution[self.sel_i-1][self.sel_j-1] != 0:
-                            prev_sel_cell_val = num_font.render(str(self.solution[self.sel_i-1][self.sel_j-1]),
-                                                                True,num_color)
+                            if self.solution[self.sel_i-1][self.sel_j-1] != self.game.grid[self.sel_i-1][self.sel_j-1]:
+                                prev_sel_cell_val = num_font.render(str(self.solution[self.sel_i-1][self.sel_j-1]),
+                                                                    True,err_color)
+                            else:
+                                prev_sel_cell_val = num_font.render(str(self.solution[self.sel_i-1][self.sel_j-1]),
+                                                                    True,entry_num_color)
                             self.screen.blit(prev_sel_cell_val,(self.sel_j*self.p+20,self.sel_i*self.p+5))
                     # Providing Selection Color to Selected Cell
                     selector = pygame.Surface((self.p,self.p))
                     selector.fill(sel_color)
                     self.screen.blit(selector, (self.j*self.p, self.i*self.p))
                     if self.solution[self.i-1][self.j-1] != 0:
-                        selected_cell_val = num_font.render(str(self.solution[self.i-1][self.j-1]),True,num_color)
+                        selected_cell_val = num_font.render(str(self.solution[self.i-1][self.j-1]),
+                                                            True,entry_num_color)
                         self.screen.blit(selected_cell_val,(self.j*self.p + 20, self.i*self.p + 5))
                     self.sel_i,self.sel_j = self.i, self.j
                     self.sel_flag = 0
@@ -251,28 +299,28 @@ class Game:
                 for i in range(9):
                     for j in range(9):
                         if self.game.puzzle[i][j] != 0:
-                            puzzle_num = num_font.render(str(self.game.puzzle[i][j]), True, num_color)
-                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5)) #Values found from T&E
+                            puzzle_num = num_font.render(str(self.game.puzzle[i][j]), True, ori_num_color)
+                            #Values 20 and 5 found from T&E
+                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5)) 
 
-                if self.value != "0":
-                    # Inputting the value into our solution for checking with our grid 
-                    self.solution[self.i-1][self.j-1] = int(self.value)
-                    
+                if self.value != "0":                    
                     # Any value in the selected cell will be removed
                     whitener = pygame.Surface((self.p, self.p))
                     whitener.fill(self.background_fill)
                     whitener_rect = self.screen.blit(whitener, (self.j * self.p, self.i * self.p))
                     pygame.display.update(whitener_rect)
 
-                    # Checking our input ... I should probably change this to where I cant do this,
-                    # then give a check button, which would then show which ones are wrong
                     if self.game.grid[self.i-1][self.j-1] != int(self.value):
-                        value = num_font.render(self.value, True, err_color)
+                        value = num_font.render(self.value,True,err_color)
+                        self.error_count += 1
                     else:
-                        value = num_font.render(self.value, True, sol_color)
+                        value = num_font.render(self.value, True, entry_num_color)
                     self.screen.blit(value, (self.j * self.p + 20, self.i * self.p + 5))
+                    # Inputting the value into our solution for checking with our grid 
+                    self.solution[self.i-1][self.j-1] = int(self.value)
+                    # For now
                     self.value = "0"
-    
+
     def quit(self):
         """Quits the Game"""
         pygame.quit()
