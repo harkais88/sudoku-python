@@ -9,7 +9,6 @@ import pygame
 import RSudoku
 import sys
 import numpy as np
-from time import sleep
 from copy import deepcopy
 
 class Game:
@@ -101,12 +100,15 @@ class Game:
                         if 2*self.p < pos[1] < 2*self.p + self.p:
                             self.sel_diff = 1
                             self.diff_flag = 0
+                        # If Medium Button is pressed
                         elif 4*self.p < pos[1] < 4*self.p + self.p:
                             self.sel_diff = 2
                             self.diff_flag = 0
+                        # If Hard Button is pressed
                         elif 6*self.p < pos[1] < 6*self.p + self.p:
                             self.sel_diff = 3
                             self.diff_flag = 0
+                        # If Impossible Button is pressed
                         elif 8*self.p < pos[1] < 8*self.p + self.p:
                             self.sel_diff = 4
                             self.diff_flag = 0
@@ -125,7 +127,7 @@ class Game:
                         pass
                 # Taking Input From Keyboard
                 if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10) \
-                    and self.sel_diff != 0 and self.main_flag == 0:
+                    and self.diff_flag == 0 and self.main_flag == 0:
                     self.value = "0"
                     if event.key == pygame.K_1:
                         self.value = "1"
@@ -157,7 +159,8 @@ class Game:
                         self.screen.fill(self.background_fill)
                         pygame.display.update()
                     if event.key == pygame.K_q: #Quit Event
-                        pygame.quit()               
+                        self.quit()
+              
 
     def draw(self):
         """Responsible for drawing at every frame"""
@@ -259,10 +262,10 @@ class Game:
                 # Setting Font Style And Colors
                 num_font = pygame.font.SysFont("Comic Sans MS",30) # Setting Font of the Numbers
                 sel_color = (177,232,237)
-                entry_num_color = (56,123,232)
+                sel_num_color = (56,123,232)
                 ori_num_color = (9,23,46)
                 # Following colors will be used when check button is given
-                sol_color = (19,214,120)
+                sol_num_color = (19,214,120)
                 err_color = (247,27,20)
 
                 # Instruction
@@ -282,7 +285,7 @@ class Game:
                                                                     True,err_color)
                             else:
                                 prev_sel_cell_val = num_font.render(str(self.solution[self.sel_i-1][self.sel_j-1]),
-                                                                    True,entry_num_color)
+                                                                    True,sol_num_color)
                             self.screen.blit(prev_sel_cell_val,(self.sel_j*self.p+20,self.sel_i*self.p+5))
                     # Providing Selection Color to Selected Cell
                     selector = pygame.Surface((self.p,self.p))
@@ -290,7 +293,7 @@ class Game:
                     self.screen.blit(selector, (self.j*self.p, self.i*self.p))
                     if self.solution[self.i-1][self.j-1] != 0:
                         selected_cell_val = num_font.render(str(self.solution[self.i-1][self.j-1]),
-                                                            True,entry_num_color)
+                                                            True,sel_num_color)
                         self.screen.blit(selected_cell_val,(self.j*self.p + 20, self.i*self.p + 5))
                     self.sel_i,self.sel_j = self.i, self.j
                     self.sel_flag = 0
@@ -314,11 +317,10 @@ class Game:
                         value = num_font.render(self.value,True,err_color)
                         self.error_count += 1
                     else:
-                        value = num_font.render(self.value, True, entry_num_color)
+                        value = num_font.render(self.value, True, sol_num_color)
                     self.screen.blit(value, (self.j * self.p + 20, self.i * self.p + 5))
                     # Inputting the value into our solution for checking with our grid 
                     self.solution[self.i-1][self.j-1] = int(self.value)
-                    # For now
                     self.value = "0"
 
     def quit(self):
