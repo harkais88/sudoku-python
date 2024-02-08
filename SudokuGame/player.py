@@ -1,7 +1,6 @@
 #Main Player Code
-#Note: Right now, it only shows up with 1 game. Should add a check button, mistake counter,
-#timer, pause option, and some music maybe, along with a bit of art for the game
-#Should add a loading screen, and animation for a lose or win event to get rid of missing value bug
+#Should add a mistake counter, pause option, and some music maybe, along with a bit of art for the game
+#Should add animation for a lose or win event to get rid of missing value bug
 
 #!/usr/bin/python3
 
@@ -280,13 +279,23 @@ class Game:
                 self.screen.blit(inst,(15,5))
 
                 # Timer
-                time = num_font.render(f"Time: {(self.frame_count//60)//60}:{(self.frame_count//60)%60}",
+                time = num_font.render(f"TIME: {(self.frame_count//60)//60}:{(self.frame_count//60)%60}",
                                        True, ori_num_color)
                 self.frame_count += 1
-                time_blank = pygame.draw.rect(self.screen,self.background_fill,(self.width-(3*self.p),0,3*self.p,self.p-3))
+                time_blank = pygame.draw.rect(self.screen,self.background_fill,
+                                              (self.width-(3*self.p),0,3*self.p,self.p-3))
                 pygame.display.update(time_blank)
                 time_display = self.screen.blit(time,(self.width-(3*self.p),5))
                 pygame.display.update(time_display)
+
+                # Error Counter
+                if self.error_count > 0:
+                    error_block = num_font.render(f"MISTAKES: {self.error_count}/5", True, ori_num_color)
+                    error_blank = pygame.draw.rect(self.screen,self.background_fill,
+                                                   (10,self.width-self.p + 10,4.3*self.p,2*self.p))
+                    pygame.display.update(error_blank)
+                    pygame.display.update(self.screen.blit(error_block,(10,self.width-self.p+10)))
+
 
                 # Coloring Selected Cell
                 if self.sel_flag == 1:
