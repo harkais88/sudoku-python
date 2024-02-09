@@ -1,8 +1,8 @@
+#!/usr/bin/python3
+
 #Main Player Code
 #Should add a mistake counter, pause option, and some music maybe, along with a bit of art for the game
 #Should add animation for a lose or win event to get rid of missing value bug
-
-#!/usr/bin/python3
 
 import pygame
 import RSudoku
@@ -276,7 +276,7 @@ class Game:
 
                 # Instruction
                 inst = num_font.render("Select Cell, Enter Number", True, ori_num_color)
-                self.screen.blit(inst,(15,5))
+                self.screen.blit(inst, (self.width//4-20,self.width-self.p+10))
 
                 # Timer
                 time = num_font.render(f"TIME: {(self.frame_count//60)//60}:{(self.frame_count//60)%60}",
@@ -292,9 +292,9 @@ class Game:
                 if self.error_count > 0:
                     error_block = num_font.render(f"MISTAKES: {self.error_count}/5", True, ori_num_color)
                     error_blank = pygame.draw.rect(self.screen,self.background_fill,
-                                                   (10,self.width-self.p + 10,4.3*self.p,2*self.p))
+                                                   (15,5,4.3*self.p,self.p//2+10))
                     pygame.display.update(error_blank)
-                    pygame.display.update(self.screen.blit(error_block,(10,self.width-self.p+10)))
+                    pygame.display.update(self.screen.blit(error_block,(15,5)))
 
 
                 # Coloring Selected Cell
@@ -355,4 +355,3 @@ class Game:
 
 if __name__ == "__main__":
     Game().run()
-    
