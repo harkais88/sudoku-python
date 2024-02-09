@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 #Main Player Code
-#Should add a mistake counter, pause option, and some music maybe, along with a bit of art for the game
-#Should add animation for a lose or win event to get rid of missing value bug
+#Should add a pause option, and some music maybe, along with a bit of art for the game
+#Should add animation for a lose or win event
 
 import pygame
 import RSudoku
@@ -29,6 +29,8 @@ class Game:
         self.p = 493 / 9 #Obtained by Trial and Error
         self.i = self.j = 10 #Used for validating mouse pos and entering values
         self.value = "0" #Used for intialising entry value
+        self.event_map = {pygame.K_1: "1", pygame.K_2: "2", pygame.K_3: "3", pygame.K_4: "4", pygame.K_5: "5",
+                     pygame.K_6: "6", pygame.K_7: "7", pygame.K_8: "8", pygame.K_9: "9"} #Input Map
         self.sel_flag = 0 # Used for checking selected cell coloring
         self.sel_i = self.sel_j = 10 # Used for storing previous selected cell
         self.solution = np.empty([9,9]) # Initializing an empty array that will be used for endgame
@@ -47,12 +49,10 @@ class Game:
 
     def handle_event(self):
         """Responsible for handling all valid events"""
-            
-        # After Lose or Win Event, I should give option to quit or new game or reset the game if lost
-        # Lose Event
+
+        # Lose Event, Screen Made from T&E
         if self.error_count == 5:
             lose_txt = "YOU LOST THE GAME\nPress R to Reset\nPress N for a New Game\nPress Q to Quit".split("\n")
-            # Lose Screen Made from T&E
             self.screen.fill(self.background_fill)
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf", 40).render(lose_txt[0],
                         True, (232, 50, 50)), (self.width//2-self.p-170,self.width//2-self.p))
@@ -64,7 +64,7 @@ class Game:
                         True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p)))                                           
             pygame.display.update()
 
-        # Win Event
+        # Win Event, Screen Made from T&E
         if np.all(np.equal(self.solution,self.game.grid)):
             win_txt = "YOU WON THE GAME!!!\nPress R to Restart\nPress N for a New Game\nPress Q to Quit".split("\n")
             self.screen.fill(self.background_fill)
@@ -82,9 +82,11 @@ class Game:
                 # Quit Event
                 if event.type == pygame.QUIT:
                     self.running = False
+                
                 # Getting Mouse Position Data
                 if event.type == pygame.MOUSEBUTTONUP:
                     pos = pygame.mouse.get_pos()
+
                     # Following occurs only in main_menu
                     if self.start == False and self.width // 2 - self.p < pos[0] < self.width // 2 + self.p:
                         # If Quit Button is pressed
@@ -94,24 +96,19 @@ class Game:
                         if self.width //2 - self.p < pos[1] < self.width // 2 :
                             self.start = True
                             self.main_flag = 1
+
+                    # When we enter the difficulity menu
                     if self.diff_flag == 1 and 2*self.p < pos[0] < 2*self.p + self.width - 4*self.p:
-                        # When we enter the difficulity menu
+                        self.diff_flag = 0
                         # If Easy Button is pressed
-                        if 2*self.p < pos[1] < 2*self.p + self.p:
-                            self.sel_diff = 1
-                            self.diff_flag = 0
+                        if 2*self.p < pos[1] < 2*self.p + self.p: self.sel_diff = 1;
                         # If Medium Button is pressed
-                        elif 4*self.p < pos[1] < 4*self.p + self.p:
-                            self.sel_diff = 2
-                            self.diff_flag = 0
+                        elif 4*self.p < pos[1] < 4*self.p + self.p: self.sel_diff = 2;
                         # If Hard Button is pressed
-                        elif 6*self.p < pos[1] < 6*self.p + self.p:
-                            self.sel_diff = 3
-                            self.diff_flag = 0
+                        elif 6*self.p < pos[1] < 6*self.p + self.p: self.sel_diff = 3;
                         # If Impossible Button is pressed
-                        elif 8*self.p < pos[1] < 8*self.p + self.p:
-                            self.sel_diff = 4
-                            self.diff_flag = 0
+                        elif 8*self.p < pos[1] < 8*self.p + self.p: self.sel_diff = 4;
+                        else: self.diff_flag = 1;
 
                     # Checks whether mouse click was within grid
                     if (self.p < pos[0] < self.width - self.p) and (self.p < pos[1] < self.width - self.p):
@@ -123,30 +120,13 @@ class Game:
                             self.i,self.j = 10,10
                         else:
                             self.sel_flag = 1
-                    except (IndexError, AttributeError):
+                    except IndexError:
                         pass
                 # Taking Input From Keyboard
                 if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10) \
                     and self.diff_flag == 0 and self.main_flag == 0:
                     self.value = "0"
-                    if event.key == pygame.K_1:
-                        self.value = "1"
-                    if event.key == pygame.K_2:
-                        self.value = "2"
-                    if event.key == pygame.K_3:
-                        self.value = "3"
-                    if event.key == pygame.K_4:
-                        self.value = "4"
-                    if event.key == pygame.K_5:
-                        self.value = "5"
-                    if event.key == pygame.K_6:
-                        self.value = "6"
-                    if event.key == pygame.K_7:
-                        self.value = "7"
-                    if event.key == pygame.K_8:
-                        self.value = "8"
-                    if event.key == pygame.K_9:
-                        self.value = "9"
+                    if event.key in self.event_map: self.value = self.event_map[event.key]; #Input Event
                     if event.key == pygame.K_r: #Reset Event
                         self.solution = deepcopy(self.game.puzzle)
                         if self.error_count == 5: self.error_count = 0;
@@ -270,7 +250,6 @@ class Game:
                 sel_color = (177,232,237)
                 sel_num_color = (56,123,232)
                 ori_num_color = (9,23,46)
-                # Following colors will be used when check button is given
                 sol_num_color = (19,214,120)
                 err_color = (247,27,20)
 
@@ -328,8 +307,7 @@ class Game:
                     for j in range(9):
                         if self.game.puzzle[i][j] != 0:
                             puzzle_num = num_font.render(str(self.game.puzzle[i][j]), True, ori_num_color)
-                            #Values 20 and 5 found from T&E
-                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5)) 
+                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5)) # Values from T&E
 
                 if self.value != "0":                    
                     # Any value in the selected cell will be removed
