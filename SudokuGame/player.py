@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 #Main Player Code
-#Should add a pause option, and some music maybe, along with a bit of art for the game
+#Should add an instruction page, and some music maybe, along with a bit of art for the game
 #Should add animation for a lose or win event
 
 import pygame
@@ -38,6 +38,8 @@ class Game:
         while np.all(np.equal(self.solution,self.game.grid)): self.solution = np.empty([9,9]);
         self.error_count = 0 #Used for recording number of errors, after 5 times game will end
         self.frame_count = 0 #Used for timer
+        self.pause_flag = False #Used for pause menu
+        self.original_frame_count = 0 #Used for pausing timer
 
     def run(self):
         """Responsible for running the game"""
@@ -123,25 +125,29 @@ class Game:
                     except IndexError:
                         pass
                 # Taking Input From Keyboard
-                if event.type == pygame.KEYDOWN and (self.i != 10 and self.j != 10) \
-                    and self.diff_flag == 0 and self.main_flag == 0:
+                if event.type == pygame.KEYDOWN and self.diff_flag == 0 and self.main_flag == 0:
                     self.value = "0"
-                    if event.key in self.event_map: self.value = self.event_map[event.key]; #Input Event
+                    if event.key in (pygame.K_ESCAPE,pygame.K_p): #Pause Event
+                        self.pause_flag = not self.pause_flag
                     if event.key == pygame.K_r: #Reset Event
+                        self.pause_flag = False
                         self.solution = deepcopy(self.game.puzzle)
-                        if self.error_count == 5: self.error_count = 0;
+                        if self.error_count > 0: self.error_count = 0;
                         self.screen.fill(self.background_fill)
                         self.frame_count = 0
                         pygame.display.update()
                     if event.key == pygame.K_n: #New Game Event
-                        if self.error_count == 5: self.error_count = 0;
+                        self.pause_flag = False
+                        if self.error_count > 0: self.error_count = 0;
                         self.game = RSudoku.sudoku(0)
                         self.diff_flag = 1
                         self.screen.fill(self.background_fill)
                         self.frame_count = 0
-                        pygame.display.update()
+                        pygame.display.update()       
                     if event.key == pygame.K_q: #Quit Event
-                        self.quit()
+                            self.quit()
+                    if (self.i != 10 and self.j != 10):
+                        if event.key in self.event_map: self.value = self.event_map[event.key]; #Input Event
 
     def draw(self):
         """Responsible for drawing at every frame"""
@@ -224,11 +230,41 @@ class Game:
                 self.game = RSudoku.sudoku(self.sel_diff)
                 self.solution = deepcopy(self.game.puzzle) #Used for end game check
 
-            if self.diff_flag == 0 and self.error_count != 5 and not np.all(np.equal(self.solution,self.game.grid)):
+            # Pause Menu
+            if self.pause_flag == True and self.diff_flag == 0:
+                self.original_frame_count = self.frame_count
+                pause_txt = "Press P/ESC to Unpause\nPress R to Restart\nPress N for a New Game\nPress Q to Quit"
+                pause_txt = pause_txt.split("\n")
+                pause_font = pygame.font.SysFont("Garamond",30)
+                pause_color = (169, 38, 181)
+                self.screen.fill(self.background_fill_alt)
+                pygame.draw.rect(self.screen, self.background_fill,
+                                (self.p-10,self.p-10,self.width - (2*(self.p - 10)),self.width - (2*(self.p - 10))))
+                self.screen.blit(pygame.font.SysFont("Comic Sans MS",50).render("PAUSED!",True,(15, 163, 91)),
+                                (self.width//2-(1.6*self.p),self.p))
+                self.screen.blit(pause_font.render(pause_txt[0],True,pause_color),
+                                 (self.width//2 - (2.5*self.p),3*self.p))
+                self.screen.blit(pause_font.render(pause_txt[1],True,pause_color),
+                                 (self.width//2 - (1.7*self.p),4.7*self.p))
+                self.screen.blit(pause_font.render(pause_txt[2],True,pause_color),
+                                 (self.width//2 - (2.4*self.p),6.7*self.p))
+                self.screen.blit(pause_font.render(pause_txt[3],True,pause_color),
+                                 (self.width//2 - (1.5*self.p),8.5*self.p))
+                pygame.display.update()
+
+            # Unpausing the Menu
+            if self.pause_flag == False and self.original_frame_count != 0:
+                self.frame_count = self.original_frame_count
+                pygame.display.update(self.screen.fill(self.background_fill))
+                self.original_frame_count = 0
+
+            if self.diff_flag == 0 and self.error_count != 5 \
+                and not np.all(np.equal(self.solution,self.game.grid)) and self.pause_flag == False:
                 if self.sel_diff != 0:
                     self.screen.fill(self.background_fill)
                     pygame.display.update()
                     self.sel_diff = 0
+
                 # Drawing the lines
                 for i in range(10):
                     if i % 3 == 0: line_width = 4;
@@ -260,7 +296,7 @@ class Game:
                 # Timer
                 time = num_font.render(f"TIME: {(self.frame_count//60)//60}:{(self.frame_count//60)%60}",
                                        True, ori_num_color)
-                self.frame_count += 1
+                if not self.pause_flag: self.frame_count += 1;
                 time_blank = pygame.draw.rect(self.screen,self.background_fill,
                                               (self.width-(3*self.p),0,3*self.p,self.p-3))
                 pygame.display.update(time_blank)
