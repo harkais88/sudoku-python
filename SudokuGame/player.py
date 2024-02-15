@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 
-#Main Player Code
-#Should add an instruction page, and some music maybe, along with a bit of art for the game
+#Main Player Code, all screen designs done using Trial and Error
+#Should add an instruction page, along with a bit of art for the game
 #Should add animation for a lose or win event
 
 import pygame
 import RSudoku
 import sys
 import numpy as np
+from random import choice
 from copy import deepcopy
 
 class Game:
@@ -40,9 +41,26 @@ class Game:
         self.frame_count = 0 #Used for timer
         self.pause_flag = False #Used for pause menu
         self.original_frame_count = 0 #Used for pausing timer
+        # Loading Sounds and Sound Flags
+        self.s_success_f = True
+        self.s_fail_f = True
+        self.s_start_up = ".\\content\\music\\start_up.mp3"
+        self.s_ding = [pygame.mixer.Sound(".\\content\\music\\ding.mp3"),
+                       pygame.mixer.Sound(".\\content\\music\\ding2.mp3"),
+                       pygame.mixer.Sound(".\\content\\music\\ding3.mp3"),
+                       pygame.mixer.Sound(".\\content\\music\\ding4.mp3")]
+        self.s_miss = [pygame.mixer.Sound(".\\content\\music\\miss.mp3"),
+                       pygame.mixer.Sound(".\\content\\music\\miss2.mp3"),
+                       pygame.mixer.Sound(".\\content\\music\\miss3.mp3")]
+        self.s_start = pygame.mixer.Sound(".\\content\\music\\start.mp3")
+        self.s_fail = pygame.mixer.Sound(".\\content\\music\\fail.mp3")
+        self.s_success = pygame.mixer.Sound(".\\content\\music\\success.mp3")
+        self.bgm = [".\\content\\music\\bgm.mp3", ".\\content\\music\\bgm2.mp3",
+                    ".\\content\\music\\bgm3.mp3", ".\\content\\music\\bgm4.mp3"]
 
     def run(self):
         """Responsible for running the game"""
+        pygame.mixer.music.load(self.s_start_up) #Loading up Main Menu Theme
         while self.running == True:
             self.handle_event()
             self.draw()  
@@ -52,8 +70,9 @@ class Game:
     def handle_event(self):
         """Responsible for handling all valid events"""
 
-        # Lose Event, Screen Made from T&E
+        # Lose Event
         if self.error_count == 5:
+            pygame.mixer.music.stop()
             lose_txt = "YOU LOST THE GAME\nPress R to Reset\nPress N for a New Game\nPress Q to Quit".split("\n")
             self.screen.fill(self.background_fill)
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf", 40).render(lose_txt[0],
@@ -63,11 +82,13 @@ class Game:
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(lose_txt[2],
                         True, (232, 50, 50)), (self.width//2 - self.p-127,self.width//2 + self.p))
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(lose_txt[3],
-                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p)))                                           
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p)))
+            if self.s_fail_f: self.s_fail.play(); self.s_fail_f = not self.s_fail_f;                                        
             pygame.display.update()
 
         # Win Event, Screen Made from T&E
         if np.all(np.equal(self.solution,self.game.grid)):
+            pygame.mixer.music.stop()
             win_txt = "YOU WON THE GAME!!!\nPress R to Restart\nPress N for a New Game\nPress Q to Quit".split("\n")
             self.screen.fill(self.background_fill)
             self.screen.blit(pygame.font.SysFont("Comic Sans MS", 30).render(win_txt[0], 
@@ -77,8 +98,10 @@ class Game:
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(win_txt[2],
                         True, (232, 50, 50)), (self.width//2 - self.p-127,self.width//2 + self.p))
             self.screen.blit(pygame.font.Font(".\content\Fonts\Copperplate.ttf",30).render(win_txt[3],
-                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p))) 
-            pygame.display.update()       
+                        True, (232, 50, 50)), (self.width//2 - self.p-80,self.width//2 + (2*self.p)))
+            pygame.mixer.unpause() 
+            if self.s_success_f: self.s_success.play(); self.s_success_f = not self.s_success_f;
+            pygame.display.update()      
             
         for event in pygame.event.get():
                 # Quit Event
@@ -135,6 +158,8 @@ class Game:
                         if self.error_count > 0: self.error_count = 0;
                         self.screen.fill(self.background_fill)
                         self.frame_count = 0
+                        self.s_success_f,self.s_fail_f = True,True
+                        self.s_start.play()
                         pygame.display.update()
                     if event.key == pygame.K_n: #New Game Event
                         self.pause_flag = False
@@ -143,6 +168,7 @@ class Game:
                         self.diff_flag = 1
                         self.screen.fill(self.background_fill)
                         self.frame_count = 0
+                        self.s_success_f,self.s_fail_f = True,True                        
                         pygame.display.update()       
                     if event.key == pygame.K_q: #Quit Event
                             self.quit()
@@ -152,6 +178,9 @@ class Game:
     def draw(self):
         """Responsible for drawing at every frame"""
         if self.start == False:
+            # Main Menu Theme
+            if not pygame.mixer.music.get_busy(): pygame.mixer.music.play();
+
             # Main Menu
             main_font = pygame.font.SysFont("Comic Sans MS",30)
             main_title_font = pygame.font.Font(".\content\Fonts\Copperplate.ttf", 100)
@@ -171,6 +200,7 @@ class Game:
             pygame.draw.rect(self.screen, (0,0,0), 
                              (self.width // 2 - self.p, self.width // 2 + self.p, 2*self.p, self.p),2)
             self.screen.blit(quit_text, (self.width // 2 - self.p + 10, self.width // 2 + self.p + 2))
+
             pygame.display.update()
         else:
             if self.main_flag == 1:
@@ -229,9 +259,12 @@ class Game:
                 pygame.display.update()
                 self.game = RSudoku.sudoku(self.sel_diff)
                 self.solution = deepcopy(self.game.puzzle) #Used for end game check
+                pygame.mixer.music.stop()
+                self.s_start.play()
 
             # Pause Menu
             if self.pause_flag == True and self.diff_flag == 0:
+                pygame.mixer.music.pause()
                 self.original_frame_count = self.frame_count
                 pause_txt = "Press P/ESC to Unpause\nPress R to Restart\nPress N for a New Game\nPress Q to Quit"
                 pause_txt = pause_txt.split("\n")
@@ -254,12 +287,17 @@ class Game:
 
             # Unpausing the Menu
             if self.pause_flag == False and self.original_frame_count != 0:
+                pygame.mixer.music.unpause()
                 self.frame_count = self.original_frame_count
                 pygame.display.update(self.screen.fill(self.background_fill))
                 self.original_frame_count = 0
 
             if self.diff_flag == 0 and self.error_count != 5 \
                 and not np.all(np.equal(self.solution,self.game.grid)) and self.pause_flag == False:
+                # if not pygame.mixer.get_busy(): choice(self.bgm).play();
+                if not pygame.mixer.music.get_busy(): 
+                    pygame.mixer.music.load(choice(self.bgm))
+                    pygame.mixer.music.play()
                 if self.sel_diff != 0:
                     self.screen.fill(self.background_fill)
                     pygame.display.update()
@@ -343,7 +381,13 @@ class Game:
                     for j in range(9):
                         if self.game.puzzle[i][j] != 0:
                             puzzle_num = num_font.render(str(self.game.puzzle[i][j]), True, ori_num_color)
-                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5)) # Values from T&E
+                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5))
+                        if self.game.puzzle[i][j] == 0 and self.solution[i][j] != 0:
+                            if self.solution[i][j] != self.game.grid[i][j]:
+                                puzzle_num = num_font.render(str(self.solution[i][j]), True, err_color)
+                            else:
+                                puzzle_num = num_font.render(str(self.solution[i][j]), True, sol_num_color)
+                            self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5))
 
                 if self.value != "0":                    
                     # Any value in the selected cell will be removed
@@ -353,11 +397,10 @@ class Game:
                     pygame.display.update(whitener_rect)
 
                     if self.game.grid[self.i-1][self.j-1] != int(self.value):
-                        value = num_font.render(self.value,True,err_color)
+                        choice(self.s_miss).play()
                         self.error_count += 1
                     else:
-                        value = num_font.render(self.value, True, sol_num_color)
-                    self.screen.blit(value, (self.j * self.p + 20, self.i * self.p + 5))
+                        choice(self.s_ding).play()
                     # Inputting the value into our solution for checking with our grid 
                     self.solution[self.i-1][self.j-1] = int(self.value)
                     self.value = "0"
