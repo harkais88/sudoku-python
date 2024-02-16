@@ -45,13 +45,10 @@ class Game:
         self.s_success_f = True
         self.s_fail_f = True
         self.s_start_up = ".\\content\\music\\start_up.mp3"
-        self.s_ding = [pygame.mixer.Sound(".\\content\\music\\ding.mp3"),
-                       pygame.mixer.Sound(".\\content\\music\\ding2.mp3"),
-                       pygame.mixer.Sound(".\\content\\music\\ding3.mp3"),
-                       pygame.mixer.Sound(".\\content\\music\\ding4.mp3")]
-        self.s_miss = [pygame.mixer.Sound(".\\content\\music\\miss.mp3"),
-                       pygame.mixer.Sound(".\\content\\music\\miss2.mp3"),
-                       pygame.mixer.Sound(".\\content\\music\\miss3.mp3")]
+        self.s_ding = [".\\content\\music\\ding.mp3", ".\\content\\music\\ding2.mp3",
+                        ".\\content\\music\\ding3.mp3", ".\\content\\music\\ding4.mp3"]
+        self.s_miss = [".\\content\\music\\miss.mp3", ".\\content\\music\\miss2.mp3",
+                       ".\\content\\music\\miss3.mp3"]
         self.s_start = pygame.mixer.Sound(".\\content\\music\\start.mp3")
         self.s_fail = pygame.mixer.Sound(".\\content\\music\\fail.mp3")
         self.s_success = pygame.mixer.Sound(".\\content\\music\\success.mp3")
@@ -86,7 +83,7 @@ class Game:
             if self.s_fail_f: self.s_fail.play(); self.s_fail_f = not self.s_fail_f;                                        
             pygame.display.update()
 
-        # Win Event, Screen Made from T&E
+        # Win Event
         if np.all(np.equal(self.solution,self.game.grid)):
             pygame.mixer.music.stop()
             win_txt = "YOU WON THE GAME!!!\nPress R to Restart\nPress N for a New Game\nPress Q to Quit".split("\n")
@@ -215,7 +212,10 @@ class Game:
                 pygame.display.update([rmv_start,rmv_quit,rmv_title])
                 self.main_flag = 0
                 self.diff_flag = 1
+
+            # Activates Difficulity Menu
             if self.diff_flag == 1:
+                # Clear Screen
                 self.screen.fill(self.background_fill_alt)
                 diff_font = pygame.font.Font(".\content\Fonts\Copperplate.ttf",40)
                 diff_text_color = (168, 50, 78)
@@ -292,16 +292,19 @@ class Game:
                 pygame.display.update(self.screen.fill(self.background_fill))
                 self.original_frame_count = 0
 
+            # Rendering Game after passing all checks
             if self.diff_flag == 0 and self.error_count != 5 \
-                and not np.all(np.equal(self.solution,self.game.grid)) and self.pause_flag == False:
-                # if not pygame.mixer.get_busy(): choice(self.bgm).play();
-                if not pygame.mixer.music.get_busy(): 
-                    pygame.mixer.music.load(choice(self.bgm))
-                    pygame.mixer.music.play()
+                and not np.all(np.equal(self.solution,self.game.grid)) and self.pause_flag == False:                
+                #Clearing the loading screen
                 if self.sel_diff != 0:
                     self.screen.fill(self.background_fill)
                     pygame.display.update()
                     self.sel_diff = 0
+
+                #Playing Background Music
+                if not pygame.mixer.music.get_busy(): 
+                    pygame.mixer.music.load(choice(self.bgm))
+                    pygame.mixer.music.play()
 
                 # Drawing the lines
                 for i in range(10):
@@ -315,9 +318,6 @@ class Game:
                     pygame.draw.line(self.screen, (0,0,0), 
                                     (self.p, self.p + (self.p * i)), (self.width - self.p,self.p + (self.p * i)), 
                                     width = line_width)
-
-                # Updating Screen
-                pygame.display.update()
 
                 # Setting Font Style And Colors
                 num_font = pygame.font.SysFont("Comic Sans MS",30) # Setting Font of the Numbers
@@ -379,9 +379,11 @@ class Game:
                 # Rendering the puzzle
                 for i in range(9):
                     for j in range(9):
+                        #Rendering Original Puzzle
                         if self.game.puzzle[i][j] != 0:
                             puzzle_num = num_font.render(str(self.game.puzzle[i][j]), True, ori_num_color)
                             self.screen.blit(puzzle_num, ((j+1)*self.p + 20, (i+1)*self.p + 5))
+                        #Rendering Puzzle after Inputs
                         if self.game.puzzle[i][j] == 0 and self.solution[i][j] != 0:
                             if self.solution[i][j] != self.game.grid[i][j]:
                                 puzzle_num = num_font.render(str(self.solution[i][j]), True, err_color)
@@ -397,13 +399,17 @@ class Game:
                     pygame.display.update(whitener_rect)
 
                     if self.game.grid[self.i-1][self.j-1] != int(self.value):
-                        choice(self.s_miss).play()
+                        pygame.mixer.Sound(choice(self.s_miss)).play()
                         self.error_count += 1
                     else:
-                        choice(self.s_ding).play()
+                        pygame.mixer.Sound(choice(self.s_ding)).play()
                     # Inputting the value into our solution for checking with our grid 
                     self.solution[self.i-1][self.j-1] = int(self.value)
                     self.value = "0"
+
+                # Updating All Possible Changes
+                pygame.display.update()
+
 
     def quit(self):
         """Quits the Game"""
