@@ -14,7 +14,7 @@ import keyboard
 #from sys import exit
 import threading 
 import art
-import playsound as pls
+import playsound3 as pls
 import time
 import sys
 import itertools
