@@ -1,0 +1,4 @@
+art==6.5
+colorama==0.4.6
+keyboard==0.13.5
+playsound3==3.3.1
