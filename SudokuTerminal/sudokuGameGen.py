@@ -21,7 +21,7 @@
 import sudokuGridGen as sgg
 from sudokuSolver import sudokuSolver
 from copy import deepcopy
-import playsound as pls
+import playsound3 as pls
 from colorama import Fore
 from colorama import Style
 import threading
