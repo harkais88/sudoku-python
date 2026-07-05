@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-from sudokuGridGen import random,checkSafe
+from sudokuGridGen import checkSafe, random
 
-def sudokuSolver(puzzle,row=0,col=0):
+
+def sudokuSolver(puzzle, row=0, col=0):
     if row == 8 and col == 9:
         return True
 
@@ -11,20 +12,21 @@ def sudokuSolver(puzzle,row=0,col=0):
         col = 0
 
     if puzzle[row][col] != 0:
-        return sudokuSolver(puzzle,row,col+1)
+        return sudokuSolver(puzzle, row, col + 1)
 
-    nolist = [i for i in range(1,9+1)]
+    nolist = [i for i in range(1, 9 + 1)]
 
     while puzzle[row][col] == 0 and len(nolist) >= 1:
-        num = random.choice(nolist) 
-        if checkSafe(puzzle,row,col,num):
+        num = random.choice(nolist)
+        if checkSafe(puzzle, row, col, num):
             puzzle[row][col] = num
-            if sudokuSolver(puzzle,row,col+1) == False:
+            if sudokuSolver(puzzle, row, col + 1) == False:
                 puzzle[row][col] = 0
         nolist.remove(num)
 
     if puzzle[row][col] == 0:
         return False
+
 
 """
 #Use when executing this script only
