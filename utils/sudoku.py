@@ -448,3 +448,18 @@ class SudokuBacktracking(SudokuAbstract):
 
         result += "\n"
         return result
+
+
+class SquareSudoku(SudokuBacktracking):
+    """Class for generating square sudoku puzzles"""
+
+    @SudokuBacktracking.number_of_symbols.setter
+    def number_of_symbols(self, value):
+        if SudokuBacktracking.number_of_symbols.fset is None:
+            raise NotImplementedError("number_of_symbols property setter not found")
+
+        sqrt = math.isqrt(value)
+        if sqrt * sqrt != value:
+            raise ValueError("Number of symbols needs to be a perfect square.")
+
+        SudokuBacktracking.number_of_symbols.fset(self, value)
