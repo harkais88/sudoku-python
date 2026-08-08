@@ -17,3 +17,9 @@ class InvalidSudokuError(ValueError):
     """Exception raised when array is not a valid sudoku"""
 
     pass
+
+
+class NumberOfSymbolsAlreadySet(ValueError):
+    """Exception raised when the number of symbols is attempted to be reset"""
+
+    pass

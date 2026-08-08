@@ -5,7 +5,7 @@ import math
 from typing import Any, Optional, Sequence
 
 from .custom_types import GRID_TYPE
-from .exceptions import InvalidSudokuError, NotSquareArrayError
+from .exceptions import InvalidSudokuError, NotSquareArrayError, NumberOfSymbolsAlreadySet
 
 
 class SudokuAbstract:
@@ -165,10 +165,17 @@ class SudokuAbstract:
         return self._number_of_symbols
 
     def _set_number_of_symbols(self, value):
+        if getattr(self, "_number_of_symbols_configured", False) is True:
+            raise NumberOfSymbolsAlreadySet(
+                "Number of symbols cannot be reconfigured. "
+                "Initialize seperate object to set new number_of_symbols"
+            )
+
         if value < 1:
             raise ValueError("Provided grid size should be atleast greater than 0")
 
         self._number_of_symbols = value
+        self._number_of_symbols_configured: bool = True
 
     number_of_symbols = property(_get_number_of_symbols, _set_number_of_symbols)
 
