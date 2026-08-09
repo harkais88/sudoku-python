@@ -142,7 +142,7 @@ def sudokuGameGen(diff,stop_loading):
                 stop_loading.set()
                 sys.stdout.flush()
                 pls.playsound('content/music/start.mp3',block=False)
-                os.system('clear')
+                os.system('cls' if os.name == 'nt' else 'clear')
                 return original,sol,noOfClues #This function returns a tuple of the puzzle and the solution
 
                 #print("\n The solution to this grid")
