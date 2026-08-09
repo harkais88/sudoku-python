@@ -28,6 +28,10 @@ import sudokuGridGen as sgg
 from colorama import Fore, Style
 from sudokuSolver import sudokuSolver
 
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONTENT_DIR = os.path.join(MODULE_DIR, "content")
+MUSIC_DIR = os.path.join(CONTENT_DIR, "music")
+
 
 def printGrid(table, original=[]):
     for i in range(len(table)):
@@ -146,7 +150,7 @@ def sudokuGameGen(diff, stop_loading):
                 # printGrid(original)
                 stop_loading.set()
                 sys.stdout.flush()
-                pls.playsound("content/music/start.mp3", block=False)
+                pls.playsound(os.path.join(MUSIC_DIR, "start.mp3"), block=False)
                 os.system("clear")
                 return (
                     original,

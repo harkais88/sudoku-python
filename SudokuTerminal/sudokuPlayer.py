@@ -19,7 +19,7 @@ import art
 import keyboard
 import playsound3 as pls
 from colorama import Back
-from sudokuGameGen import Fore, Style, deepcopy, diffInput, printGrid, sgg, sudokuGameGen
+from sudokuGameGen import MUSIC_DIR, Fore, Style, deepcopy, diffInput, printGrid, sgg, sudokuGameGen
 
 hint_chck = False
 
@@ -107,10 +107,10 @@ def loading(stop_loading):
 
 def bgm():
     music = [
-        "content/music/bgm.mp3",
-        "content/music/bgm2.mp3",
-        "content/music/bgm3.mp3",
-        "content/music/bgm4.mp3",
+        os.path.join(MUSIC_DIR, "bgm.mp3"),
+        os.path.join(MUSIC_DIR, "bgm2.mp3"),
+        os.path.join(MUSIC_DIR, "bgm3.mp3"),
+        os.path.join(MUSIC_DIR, "bgm4.mp3"),
     ]
     while True:
         pls.playsound(sgg.random.choice(music))
@@ -203,7 +203,7 @@ if __name__ == "__main__":
                         streak = 0
                     score -= 3
                     puzzle[row][col] = 0
-                    pls.playsound("content/music/miss.mp3", block=False)
+                    pls.playsound(os.path.join(MUSIC_DIR, "miss.mp3"), block=False)
                     print("\n Not correct, try another one \n")
                     error_counter += 1
                     print("\n Mistakes: {}/3 \n".format(error_counter))
@@ -211,21 +211,21 @@ if __name__ == "__main__":
                     streak += 1
                     score += 1
                     os.system("clear")
-                    pls.playsound("content/music/ding.mp3", block=False)
+                    pls.playsound(os.path.join(MUSIC_DIR, "ding.mp3"), block=False)
                     print("\n {} \n".format(sgg.random.choice(remarks)))
 
         printGrid(puzzle, original)
         if filledGrid(puzzle) == True:
-            pls.playsound("content/music/success.mp3")
+            pls.playsound(os.path.join(MUSIC_DIR, "success.mp3"))
             print("\n Congratulations!! Puzzle solved!")
             print("\n Final Score: {:.2f}%".format((score / (81 - noOfClues)) * 100))
         else:  # Meaning we failed the game
-            pls.playsound("content/music/fail.mp3")
+            pls.playsound(os.path.join(MUSIC_DIR, "fail.mp3"))
             print("\n Oh man, nice try!! Try again, we believe in you!")
             print("\n The solution to this puzzle")
             printGrid(sol)
     except KeyboardInterrupt:
-        pls.playsound("content/music/fail.mp3")
+        pls.playsound(os.path.join(MUSIC_DIR, "fail.mp3"))
         print("\n\n Oh, no problem bro, try again someday! \n")
         print("\n The solution to this puzzle \n")
         printGrid(sol)
