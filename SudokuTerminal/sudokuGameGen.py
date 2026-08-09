@@ -19,6 +19,7 @@ Edit: Successfully made a Sudoku Solver, and successfully used it to generate un
 """
 
 import os
+import subprocess
 import sys
 import threading
 from copy import deepcopy
@@ -94,6 +95,12 @@ def diffSet(diff):
     return noOfClues
 
 
+def clear_screen() -> None:
+    """Clear console screen."""
+
+    subprocess.run(["clear"] if os.name != "nt" else ["cmd", "/C", "cls"])
+
+
 def sudokuGameGen(diff, stop_loading):
     # diff = diffInput()
 
@@ -151,7 +158,8 @@ def sudokuGameGen(diff, stop_loading):
                 stop_loading.set()
                 sys.stdout.flush()
                 pls.playsound(os.path.join(MUSIC_DIR, "start.mp3"), block=False)
-                os.system("cls" if os.name == "nt" else "clear")
+                # os.system("cls" if os.name == "nt" else "clear")
+                clear_screen()
                 return (
                     original,
                     sol,
