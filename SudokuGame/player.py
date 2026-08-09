@@ -4,6 +4,7 @@
 # Should add an instruction page, along with a bit of art for the game
 # Should add animation for a lose or win event
 
+import os
 import sys
 from copy import deepcopy
 from random import choice
@@ -11,6 +12,11 @@ from random import choice
 import numpy as np
 import pygame
 import RSudoku
+
+MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONTENT_DIR = os.path.join(MODULE_DIR, "content")
+MUSIC_DIR = os.path.join(CONTENT_DIR, "music")
+FONT_DIR = os.path.join(CONTENT_DIR, "Fonts")
 
 
 class Game:
@@ -58,26 +64,26 @@ class Game:
         # Loading Sounds and Sound Flags
         self.s_success_f = True
         self.s_fail_f = True
-        self.s_start_up = ".\\content\\music\\start_up.mp3"
+        self.s_start_up = os.path.join(MUSIC_DIR, "start_up.mp3")
         self.s_ding = [
-            ".\\content\\music\\ding.mp3",
-            ".\\content\\music\\ding2.mp3",
-            ".\\content\\music\\ding3.mp3",
-            ".\\content\\music\\ding4.mp3",
+            os.path.join(MUSIC_DIR, "ding.mp3"),
+            os.path.join(MUSIC_DIR, "ding2.mp3"),
+            os.path.join(MUSIC_DIR, "ding3.mp3"),
+            os.path.join(MUSIC_DIR, "ding4.mp3"),
         ]
         self.s_miss = [
-            ".\\content\\music\\miss.mp3",
-            ".\\content\\music\\miss2.mp3",
-            ".\\content\\music\\miss3.mp3",
+            os.path.join(MUSIC_DIR, "miss.mp3"),
+            os.path.join(MUSIC_DIR, "miss2.mp3"),
+            os.path.join(MUSIC_DIR, "miss3.mp3"),
         ]
-        self.s_start = pygame.mixer.Sound(".\\content\\music\\start.mp3")
-        self.s_fail = pygame.mixer.Sound(".\\content\\music\\fail.mp3")
-        self.s_success = pygame.mixer.Sound(".\\content\\music\\success.mp3")
+        self.s_start = pygame.mixer.Sound(os.path.join(MUSIC_DIR, "start.mp3"))
+        self.s_fail = pygame.mixer.Sound(os.path.join(MUSIC_DIR, "fail.mp3"))
+        self.s_success = pygame.mixer.Sound(os.path.join(MUSIC_DIR, "success.mp3"))
         self.bgm = [
-            ".\\content\\music\\bgm.mp3",
-            ".\\content\\music\\bgm2.mp3",
-            ".\\content\\music\\bgm3.mp3",
-            ".\\content\\music\\bgm4.mp3",
+            os.path.join(MUSIC_DIR, "bgm.mp3"),
+            os.path.join(MUSIC_DIR, "bgm2.mp3"),
+            os.path.join(MUSIC_DIR, "bgm3.mp3"),
+            os.path.join(MUSIC_DIR, "bgm4.mp3"),
         ]
 
     def run(self):
@@ -100,25 +106,25 @@ class Game:
             )
             self.screen.fill(self.background_fill)
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 40).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 40).render(
                     lose_txt[0], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 170, self.width // 2 - self.p),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     lose_txt[1], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 80, self.width // 2),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     lose_txt[2], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 127, self.width // 2 + self.p),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     lose_txt[3], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 80, self.width // 2 + (2 * self.p)),
@@ -140,19 +146,19 @@ class Game:
                 (self.width // 4, self.width // 2 - self.p),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     win_txt[1], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 80, self.width // 2),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     win_txt[2], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 127, self.width // 2 + self.p),
             )
             self.screen.blit(
-                pygame.font.Font(".\content\Fonts\Copperplate.ttf", 30).render(
+                pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 30).render(
                     win_txt[3], True, (232, 50, 50)
                 ),
                 (self.width // 2 - self.p - 80, self.width // 2 + (2 * self.p)),
@@ -261,7 +267,7 @@ class Game:
 
             # Main Menu
             main_font = pygame.font.SysFont("Comic Sans MS", 30)
-            main_title_font = pygame.font.Font(".\content\Fonts\Copperplate.ttf", 100)
+            main_title_font = pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 100)
 
             # Main Title
             main_title = main_title_font.render("PYDOKU", True, (52, 235, 177))
@@ -317,7 +323,7 @@ class Game:
             if self.diff_flag == 1:
                 # Clear Screen
                 self.screen.fill(self.background_fill_alt)
-                diff_font = pygame.font.Font(".\content\Fonts\Copperplate.ttf", 40)
+                diff_font = pygame.font.Font(os.path.join(FONT_DIR, "Copperplate.ttf"), 40)
                 diff_text_color = (168, 50, 78)
 
                 # Diff Choice Container
