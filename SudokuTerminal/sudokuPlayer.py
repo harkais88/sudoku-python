@@ -33,14 +33,14 @@ def filledGrid(puzzle):
     global hint_chck
     while True:
         if keyboard.is_pressed("m"):
-            os.system('clear')
+            os.system('cls' if os.name == 'nt' else 'clear')
                     
             while True:
                 print("\n Menu System Activated, Select an option: \n 1) Give a hint 2) Exit \n System will continue running until right key is pressed")
 
                 if keyboard.is_pressed("1"):
                     if hint_chck == False:
-                        os.system('clear')
+                        os.system('cls' if os.name == 'nt' else 'clear')
                         printGrid(puzzle)
                         print("\n Enter the row and column number of the cell you want revealed: ")
                         row = int(input("\n Enter the row number: ")) - 1
@@ -53,13 +53,13 @@ def filledGrid(puzzle):
                     break
                     
                 elif keyboard.is_pressed("2"):
-                    os.system('clear')
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     print("\n Oh man, nice try!! Try again, we believe in you!")
                     print("\n The solution to this puzzle")
                     printGrid(sol)
                     exit()
                 else:
-                    os.system('clear')
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     continue"""
 
 def numbers_left(num,puzzle):
@@ -83,7 +83,7 @@ def loading(stop_loading):
             sys.stdout.flush()
             counter += 1
             time.sleep(0.2)
-    #os.system('clear')
+    #os.system('cls' if os.name == 'nt' else 'clear')
     #sys.stdout.flush()
        
 
@@ -97,7 +97,7 @@ loading = threading.Thread(target = loading, args=(stop_loading,), daemon=True)
 
 if __name__ == "__main__":
     #Generate puzzle and solution to puzzle
-    os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
     
     threading.Thread(target=bgm, daemon=True).start() #For playing the background music
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     streak = 0
     score = 0
 
-    os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
     #print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
     try:
         while filledGrid(puzzle) == False:
@@ -127,7 +127,7 @@ if __name__ == "__main__":
             if streak != 0:
                 print("\n On a roll man, current streak: {} \n".format(streak))
 
-            #os.system('clear')
+            #os.system('cls' if os.name == 'nt' else 'clear')
             print(Fore.CYAN + art.text2art("SUDOKU!!",font="epic") + Style.RESET_ALL)
             printGrid(puzzle,original)
             print("\n Numbers Left! : ",end="")
@@ -154,16 +154,16 @@ if __name__ == "__main__":
                     continue
 
             if puzzle[row][col] != 0:
-                os.system("clear")
+                os.system('cls' if os.name == 'nt' else 'clear')
                 print("\n This one's already filled, try another one")
             else:
                 while puzzle[row][col] < 1 or puzzle[row][col] > 9:
                     puzzle[row][col] = int(input("\n Enter the number into the grid: "))
                     if puzzle[row][col] < 1 or puzzle[row][col] > 9:
-                        #os.system("clear")
+                        #os.system('cls' if os.name == 'nt' else 'clear')
                         print("\n Please enter a valid number")
                 if puzzle[row][col] != sol[row][col]:
-                    os.system('clear')
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     if streak != 0:
                         streak = 0
                     score -= 3
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 else:
                     streak += 1
                     score += 1
-                    os.system('clear')
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     pls.playsound('content/music/ding.mp3',block=False)
                     print("\n {} \n".format(sgg.random.choice(remarks)))
 
