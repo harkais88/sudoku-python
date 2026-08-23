@@ -61,11 +61,69 @@ Both of these games have been given music (all of them taken from pixabay) and h
 
 <h1>How to Use</h1>
 
+Before running any of the games, you need to install the dependencies required for them. These are provided through the requirements.txt files provided in each game folder. It is recommended that a virtual environment is used to ensure dependencies are not installed globally in the system.
+
+For convenience, a setup helper script has been provided, which can be used to setup a virtual environment and install all required dependencies. To use the setup script, use the following command from the project root:
+
+Note: For Linux Systems, in case it is showing that the python command may not be available, use python3 instead.
+
+```bash
+# Use this command to check options provided by the setup helper.
+
+python setup.py -h
+
+# Alternatively, use the following command, which should cover all necessary dependencies.
+
+python setup.py \
+    --upgrade-pip true \
+    --global false \
+    --env-dir . \
+    --env-name venv \
+    --install-gui-requirements true \
+    --install-terminal-requirements true \
+    --install-dev-dependencies false
+```
+
+Alternatively, you can install manually using the provided requirements.txt files. Use the following command to install using the requirements.txt files:
+
+```bash
+python -m pip install -r <GAME FOLDER>/requirements.txt
+```
+
+<h3>Player Script</h3>
+A convenient player script has been provided, that can be used to invoke both games. To run any of the sudoku games, run the following command:
+
+```bash
+# Start the sudoku terminal game
+
+python play.py terminal
+# OR
+python play.py --game-type terminal
+
+# Start the pygame sudoku game
+
+python play.py gui
+# OR
+python play.py --game-type gui
+```
+
 <h3>Terminal Sudoku</h3>
 To use the terminal sudoku, download the SudokuTerminal folder, and run the sudokuPlayer.py script. Alternatively, you could use pyinstaller to convert the script to an .exe file for this, just remember to use a spec file to account for the content folder.
 
+```bash
+cd SudokuTerminal/
+python -m pip install -r requirements.txt
+python sudokuPlayer.py
+```
+
 <h3>Pygame Sudoku</h3>
 To use the pygame version, download the SudokuGame folder and run the player.py script. Or you may convert it to an .exe file using pyinstaller. 
+
+```bash
+cd SudokuGame/
+python -m pip install -r requirements.txt
+python player.py
+```
 
 <h1>Preview</h1>
 
