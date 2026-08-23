@@ -11,7 +11,12 @@ from random import choice
 
 import numpy as np
 import pygame
-import RSudoku
+
+try:
+    from . import RSudoku
+except ImportError:
+    import RSudoku
+
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONTENT_DIR = os.path.join(MODULE_DIR, "content")
@@ -631,5 +636,9 @@ class Game:
         sys.exit()
 
 
-if __name__ == "__main__":
+def main():
     Game().run()
+
+
+if __name__ == "__main__":
+    main()

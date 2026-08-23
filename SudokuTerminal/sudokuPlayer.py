@@ -7,6 +7,7 @@
 # IMP NOTE: THIS SERVES AS THE PROTOTYPE TO THE MAIN SUDOKU GAME THAT IS TO BE CREATED IN PYGAME. THAT BEING SAID, HAVE FUN WITH THIS ONE.
 # THIS WILL BE CONSIDERED THE BASIS OF v1.0
 
+import importlib
 import itertools
 import os
 import sys
@@ -19,17 +20,26 @@ import art
 import keyboard
 import playsound3 as pls
 from colorama import Back
-from sudokuGameGen import (
-    MUSIC_DIR,
-    Fore,
-    Style,
-    clear_screen,
-    deepcopy,
-    diffInput,
-    printGrid,
-    sgg,
-    sudokuGameGen,
+
+try:
+    sudokuGameGen = importlib.import_module(".sudokuGameGen", package=__package__)
+except (TypeError, ImportError):
+    sudokuGameGen = importlib.import_module("sudokuGameGen")
+
+_sudokuGameGenImportables = (
+    "MUSIC_DIR",
+    "Fore",
+    "Style",
+    "clear_screen",
+    "deepcopy",
+    "diffInput",
+    "printGrid",
+    "sgg",
+    "sudokuGameGen",
 )
+
+globals().update({name: getattr(sudokuGameGen, name) for name in _sudokuGameGenImportables})
+
 
 hint_chck = False
 
@@ -129,7 +139,8 @@ def bgm():
 stop_loading = threading.Event()
 loading = threading.Thread(target=loading, args=(stop_loading,), daemon=True)
 
-if __name__ == "__main__":
+
+def main():
     # Generate puzzle and solution to puzzle
     clear_screen()
 
@@ -239,3 +250,7 @@ if __name__ == "__main__":
         print("\n\n Oh, no problem bro, try again someday! \n")
         print("\n The solution to this puzzle \n")
         printGrid(sol)
+
+
+if __name__ == "__main__":
+    main()
