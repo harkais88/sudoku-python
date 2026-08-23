@@ -25,9 +25,14 @@ import threading
 from copy import deepcopy
 
 import playsound3 as pls
-import sudokuGridGen as sgg
 from colorama import Fore, Style
-from sudokuSolver import sudokuSolver
+
+try:
+    from . import sudokuGridGen as sgg
+    from .sudokuSolver import sudokuSolver
+except ImportError:
+    import sudokuGridGen as sgg
+    from sudokuSolver import sudokuSolver
 
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONTENT_DIR = os.path.join(MODULE_DIR, "content")

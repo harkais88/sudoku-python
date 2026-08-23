@@ -1,6 +1,10 @@
 #!/usr/bin/python3
+import random
 
-from sudokuGridGen import checkSafe, random
+try:
+    from .sudokuGridGen import checkSafe
+except ImportError:
+    from sudokuGridGen import checkSafe
 
 
 def sudokuSolver(puzzle, row=0, col=0):
