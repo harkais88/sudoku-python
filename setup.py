@@ -215,7 +215,7 @@ def main():
 
     install_global: bool = args.is_global
     virtual_env_dir: str = os.path.join(args.env_dir, args.env_name)
-    if not is_virtual_environment() and install_global is True:
+    if not is_virtual_environment() and install_global is False:
         virtual_env_dir = setup_virtual_environment(env_dir=args.env_dir, env_name=args.env_name)
 
     print("Running installation......")
