@@ -68,20 +68,13 @@ For convenience, a setup helper script has been provided, which can be used to s
 Note: For Linux Systems, in case it is showing that the python command may not be available, use python3 instead.
 
 ```bash
-# Use this command to check options provided by the setup helper.
+python setup.py --upgrade-pip --env-dir . --env-name venv --install-gui-requirements --install-terminal-requirements
+```
 
+To view all available options, use the following command:
+
+```bash
 python setup.py -h
-
-# Alternatively, use the following command, which should cover all necessary dependencies.
-
-python setup.py \
-    --upgrade-pip true \
-    --global false \
-    --env-dir . \
-    --env-name venv \
-    --install-gui-requirements true \
-    --install-terminal-requirements true \
-    --install-dev-dependencies false
 ```
 
 Alternatively, you can install manually using the provided requirements.txt files. Use the following command to install using the requirements.txt files:
