@@ -14,8 +14,20 @@ SUDOKU_GUI_REQUIREMENTS_PATH = os.path.join(SUDOKU_GUI_MODULE_DIR, "requirements
 SUDOKU_TERMINAL_REQUIREMENTS_PATH = os.path.join(SUDOKU_TERMINAL_MODULE_DIR, "requirements.txt")
 
 
+def get_python_binary_path(virtual_env_dir: str | None = None):
+    if virtual_env_dir is None or not is_virtual_environment(virtual_env_dir):
+        return "python3" if os.name == "posix" else "python"
+
+    virtual_env_python_binary_path = (
+        os.path.join("bin", "python")
+        if os.name == "posix"
+        else os.path.join("Scripts", "python.exe")
+    )
+    return os.path.join(virtual_env_dir, virtual_env_python_binary_path)
+
+
 def installer(
-    virutal_env_dir: str | None = None,
+    virtual_env_dir: str | None = None,
     upgrade_pip: bool = True,
     install_terminal_requirements: bool = True,
     install_gui_requirements: bool = True,
@@ -30,11 +42,11 @@ def installer(
         it will not be used.
     """
 
-    virutal_env_dir = virutal_env_dir or ""
-    if not virutal_env_dir:
-        virutal_env_dir = ""
+    virtual_env_dir = virtual_env_dir or ""
+    if not virtual_env_dir:
+        virtual_env_dir = ""
 
-    python_path = os.path.join(virutal_env_dir, "bin", "python")
+    python_path = get_python_binary_path(virtual_env_dir)
     if upgrade_pip is True:
         print("Upgrading pip........")
         subprocess.run([python_path, "-m", "pip", "install", "--upgrade", "pip"])
@@ -58,7 +70,19 @@ def installer(
         print()
 
 
-def is_virtual_environment() -> bool:
+def is_virtual_environment(virtual_env_dir: str) -> bool:
+    """Check whether provided path is a valid python virtual environment directory."""
+
+    return os.path.exists(os.path.join(virtual_env_dir, "pyvenv.cfg")) and (
+        os.path.exists(
+            os.path.join(virtual_env_dir, "bin", "python")
+            if os.name == "posix"
+            else os.path.join(virtual_env_dir, "Scripts", "python.exe")
+        )
+    )
+
+
+def is_running_virtual_environment() -> bool:
     """Check whether program is running in a virtual environment.
 
     References
@@ -78,7 +102,7 @@ def _print_successful_virtual_environment_setup_message(env_path: str) -> None:
     print(
         f"\nSetup new virtual environment {env_path}. Use the `"
         + (
-            os.path.join(env_path, "Scripts", "activate")
+            os.path.join(os.path.basename(env_path), "Scripts", "activate")
             if os.name == "nt"
             else "source " + os.path.join(env_path, "bin", "activate")
         )
@@ -153,16 +177,14 @@ def get_arguments() -> argparse.Namespace:
 
     parser.add_argument(
         "--upgrade-pip",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether pip should be upgraded",
     )
     parser.add_argument(
         "--global",
         dest="is_global",
-        type=bool,
-        default=False,
+        action="store_true",
         required=False,
         help="Set whether required dependencies should be installed globally or not. "
         "This avoids the creation of a virtual environment. However, it is recommended "
@@ -185,22 +207,19 @@ def get_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--install-gui-requirements",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether the dependencies for the Sudoku GUI game should be installed.",
     )
     parser.add_argument(
         "--install-terminal-requirements",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether the dependencies for the Sudoku Terminal game should be installed.",
     )
     parser.add_argument(
         "--install-dev-dependencies",
-        type=bool,
-        default=False,
+        action="store_true",
         required=False,
         help="Set whether optional developer dependencies should "
         "be installed, which can be used for developing this project.",
@@ -215,12 +234,14 @@ def main():
 
     install_global: bool = args.is_global
     virtual_env_dir: str = os.path.join(args.env_dir, args.env_name)
-    if not is_virtual_environment() and install_global is True:
+    if (
+        not is_running_virtual_environment() or not is_virtual_environment(virtual_env_dir)
+    ) and install_global is False:
         virtual_env_dir = setup_virtual_environment(env_dir=args.env_dir, env_name=args.env_name)
 
     print("Running installation......")
     installer(
-        virutal_env_dir=virtual_env_dir,
+        virtual_env_dir=virtual_env_dir,
         upgrade_pip=args.upgrade_pip,
         install_gui_requirements=args.install_gui_requirements,
         install_terminal_requirements=args.install_terminal_requirements,
