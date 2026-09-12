@@ -18,8 +18,10 @@ def get_python_binary_path(virtual_env_dir: str | None = None):
     if virtual_env_dir is None or not is_virtual_environment(virtual_env_dir):
         return "python3" if os.name == "posix" else "python"
 
-    virtual_env_python_binary_path = os.path.join(
-        "bin" if os.name == "posix" else "Scripts", "python.exe"
+    virtual_env_python_binary_path = (
+        os.path.join("bin", "python")
+        if os.name == "posix"
+        else os.path.join("Scripts", "python.exe")
     )
     return os.path.join(virtual_env_dir, virtual_env_python_binary_path)
 
