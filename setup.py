@@ -177,16 +177,14 @@ def get_arguments() -> argparse.Namespace:
 
     parser.add_argument(
         "--upgrade-pip",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether pip should be upgraded",
     )
     parser.add_argument(
         "--global",
         dest="is_global",
-        type=bool,
-        default=False,
+        action="store_true",
         required=False,
         help="Set whether required dependencies should be installed globally or not. "
         "This avoids the creation of a virtual environment. However, it is recommended "
@@ -209,22 +207,19 @@ def get_arguments() -> argparse.Namespace:
     )
     parser.add_argument(
         "--install-gui-requirements",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether the dependencies for the Sudoku GUI game should be installed.",
     )
     parser.add_argument(
         "--install-terminal-requirements",
-        type=bool,
-        default=True,
+        action="store_true",
         required=False,
         help="Set whether the dependencies for the Sudoku Terminal game should be installed.",
     )
     parser.add_argument(
         "--install-dev-dependencies",
-        type=bool,
-        default=False,
+        action="store_true",
         required=False,
         help="Set whether optional developer dependencies should "
         "be installed, which can be used for developing this project.",
