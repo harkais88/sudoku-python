@@ -100,7 +100,7 @@ def _print_successful_virtual_environment_setup_message(env_path: str) -> None:
     print(
         f"\nSetup new virtual environment {env_path}. Use the `"
         + (
-            os.path.join(env_path, "Scripts", "activate")
+            os.path.join(os.path.basename(env_path), "Scripts", "activate")
             if os.name == "nt"
             else "source " + os.path.join(env_path, "bin", "activate")
         )
